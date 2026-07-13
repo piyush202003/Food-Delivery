@@ -30,9 +30,13 @@ INSTALLED_APPS = [
 
 INSTALLED_APPS += [
     'django_browser_reload',
+    "tailwind",
+    "theme",
     'accounts',
     "FeaturesApp",
 ]
+
+TAILWIND_APP_NAME = "theme"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
