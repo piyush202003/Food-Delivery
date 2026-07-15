@@ -1,8 +1,16 @@
+from multiprocessing import context
+
 from django.shortcuts import render
 
 # Create your views here.
 def Home(request):
-    return render(request, "Home.html")
+    context = {
+        "user" : {
+            "name" : "John Doe", "email" : "john@example.com", "isAdmin" : True
+        },
+        "cartCount":12,
+    }
+    return render(request, "Home.html", context=context)
 
 def Products(request):
     return render(request, "Products.html")

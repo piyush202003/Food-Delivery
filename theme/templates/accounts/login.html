@@ -38,12 +38,12 @@
                     <p class="text-sm text-gray-500">
                         {% if is_login %}
                             Don't have an account? 
-                            <a href="{% url 'register' %}" class="text-orange-500 ml-1 font-semibold hover:text-orange-600">
+                            <a href="{% url 'Register' %}" class="text-orange-500 ml-1 font-semibold hover:text-orange-600">
                                 Create one
                             </a>
                         {% else %}
                             Already have an account?
-                            <a href="{% url 'login' %}" class="text-orange-500 ml-1 font-semibold hover:text-orange-600">
+                            <a href="{% url 'Login' %}" class="text-orange-500 ml-1 font-semibold hover:text-orange-600">
                                 Sign in
                             </a>
                         {% endif %}
@@ -76,7 +76,7 @@
                             <input type="password" name="password" required placeholder="********" class="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
                         </div>
                     </label>
-                    <button type="submit" class="items-center justify-center w-full py-3 bg-green-950 text-white font-semibold rounded-xl hover:bg-green-900 transition-colors disabled:opacity-50">
+                    <button type="submit" class="items-center justify-center w-full py-3 bg-green-950 text-white font-semibold rounded-xl hover:bg-green-800 transition-colors disabled:opacity-50">
                         
                         {% if is_login %}
                             Sign In
