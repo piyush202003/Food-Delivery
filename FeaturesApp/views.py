@@ -9,11 +9,6 @@ def Home(request):
             "name" : "John Doe", "email" : "john@example.com", "isAdmin" : True
         },
         "cartCount":12,
-        "hero_features" : [
-            {"id":1,"title":"red","desc":"good color"},
-            {"id":2,"title": "blue", "desc":"bad color"},
-            {"id":3,"title":"green", "desc":"dicasting color"},
-        ],
     }
     return render(request, "Home.html", context=context)
 
