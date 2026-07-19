@@ -14,18 +14,59 @@
                 <h2 class="text-lg font-medium">Your cart</h2>
                 <span class="px-2 py-0.5 text-xs font-semibold bg-amber-100 rounded-full">{{ cart.cart_count }} Items</span>
             </div>
-            <button id="Sidebar-cancel-btn" class="hover:cursor-pointer">
+            <button id="Sidebar-cancel-btn" class=" p-2 hover:cursor-pointer hover:bg-amber-200">
                 <img src="{% static 'icons/cancel.svg' %}" class="size-5">
             </button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-5 space-y-4">
             
-            {% if items.length == 0 %}
+            {% if cart.cart_count == 0 %}
                 <div class="flex flex-col items-center justify-center h-full text-center">
                     <img src="{% static 'icons/shopping-bag-grey.svg' %}" class="size-16 md-4">
                     <h3 class="text-lg font-medium mb-1">Your cart is empty</h3>
                 </div>
+            {% else %}
+                
+                {% for item in cart.cart_items %}
+                    <div class="flex gap-3 bg-amber-100/60 rounded-xl p-3">
+                        <img src="{{ item.image }}" alt="{{ item.name }}" class="size-16 rounded-lg object-cover shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-semibold truncate">{{ item.name }}</h4>
+                            <p class="text-xs text-zinc-300">$ {{ item.price }} / {{ item.unit }}</p>
+                            <div class="flex items-center justify-between mt-2">
+                                
+                                <form action="{% url 'UpdateCart' item.product.id %}" method="post">
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        name="action"
+                                        value="decrease"
+                                        class="size-7 rounded-lg bg-white border border-zinc-200 flex items-center justify-center">
+                                        <img src="{% static 'icons/minus-dark.svg' %}" class="size-4">
+                                    </button>
+
+                                    <span>{{ item.quantity }}</span>
+
+                                    <button
+                                        type="submit"
+                                        name="action"
+                                        value="increase"
+                                        class="size-7 rounded-lg bg-white border border-zinc-200 flex items-center justify-center">
+                                        <img src="{% static 'icons/plus-dark.svg' %}" class="size-4">
+                                    </button>
+
+                                </form>
+
+                                <div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                    
             {% endif %}
                 
         </div>

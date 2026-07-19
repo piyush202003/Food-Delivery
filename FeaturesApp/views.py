@@ -67,17 +67,29 @@ def remove_from_cart(request, product_id):
     return redirect("Home")
 
 def update_cart(request, product_id):
-    if request.method == "POST":
-        quantity = int(request.POST.get("quantity", 1))
-        cart = request.session.get('cart',{})
-        product_id = str(product_id)
-        if quantity > 0:
-            cart[product_id] = quantity
-        else:
-            cart.pop(product_id, None)
-        request.session['cart'] = cart
 
-    return redirect('Home')
+    if request.method == "POST":
+
+        action = request.POST.get("action")
+
+        cart = request.session.get("cart", {})
+
+        product_id = str(product_id)
+
+        if product_id in cart:
+
+            if action == "increase":
+                cart[product_id] += 1
+
+            elif action == "decrease":
+                cart[product_id] -= 1
+
+                if cart[product_id] <= 0:
+                    del cart[product_id]
+
+        request.session["cart"] = cart
+
+    return redirect("Home")
 
 def clear_cart(request):
     request.session['cart'] = {}
