@@ -11,4 +11,5 @@ urlpatterns = [
     path("orders/", MyOrders, name="MyOrders"),
     path("orders/<int:odid>/", OrderTracking, name = "OrderTracking"),
     path("addresses/", Addresses, name = "Addresses"),
+    path("cart/add/<str:product_id>/", add_to_cart, name="AddToCart"),
 ]

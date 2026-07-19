@@ -1,220 +1,89 @@
-from multiprocessing import context
-
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from .dummyData import dummyProducts, dummyCategoriesData
+from .models import Product
 
 # Create your views here.
 def Home(request):
     context = {
-        "user" : {
-            "name" : "John Doe", "email" : "john@example.com", "isAdmin" : True
-        },
         "cartCount":12,
-        "categoriesData" : [
-            { "slug": "fruits-vegetables", "name": "Fruits & Vegetables", "image": "fruits_vegetables" },
-            { "slug": "personal-care", "name": "Personal Care", "image": "personal_care" },
-            { "slug": "pantry-staples", "name": "Pantry Staples", "image": "pantry_staples" },
-            { "slug": "bakery", "name": "Bakery", "image": "bakery" },
-            { "slug": "beverages", "name": "Beverages", "image": "drinks" },
-            { "slug": "meat-seafood", "name": "Meat & Seafood", "image": "meat_seafood" },
-            { "slug": "snacks", "name": "Snacks", "image": "snacks" },
-            { "slug": "frozen-foods", "name": "Frozen Foods", "image": "frozen_foods" },
-            { "slug": "baby-care", "name": "Baby Care", "image": "baby_care" },
-            { "slug": "dairy-eggs", "name": "Dairy & Eggs", "image": "dairy_eggs" },
-        ],
-        "products" : [
-            {
-                "_id": "69c22613ae75a98c7cd13b3b",
-                "name": "Butter Croissant 100g",
-                "description": "Flaky and buttery",
-                "price": 45,
-                "originalPrice": 50,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/zvoeqbvrbrt7atqj0dbu.png",
-                "category": "bakery",
-                "unit": "100g",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.118Z",
-                "updatedAt": "2026-03-24T05:50:11.118Z",
-                "discount": 10,
-                "id": "69c22613ae75a98c7cd13b3b",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b37",
-                "name": "Organic Quinoa 500g",
-                "description": "High protein, Gluten-free",
-                "price": 420,
-                "originalPrice": 450,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/cxrrgnf12xuhkr4dyhi2.png",
-                "category": "pantry-staples",
-                "unit": "500g",
-                "stock": 100,
-                "isOrganic": True,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.118Z",
-                "updatedAt": "2026-03-24T05:50:11.118Z",
-                "discount": 7,
-                "id":"69c22613ae75a98c7cd13b37",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b3a",
-                "name": "Brown Bread 400g",
-                "description": "Soft and healthy, Ideal for breakfast",
-                "price": 35,
-                "originalPrice": 40,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/vy1xa7zovcu22smzapzv.png",
-                "category": "bakery",
-                "unit": "400g",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.118Z",
-                "updatedAt": "2026-03-24T05:50:11.118Z",
-                "discount": 13,
-                "id": "69c22613ae75a98c7cd13b3a",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b36",
-                "name": "Barley 1kg",
-                "description": "Rich in fiber, Helps digestion",
-                "price": 140,
-                "originalPrice": 150,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/spb5sgy8g24rned9nwog.png",
-                "category": "pantry-staples",
-                "unit": "1kg",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.118Z",
-                "updatedAt": "2026-03-24T05:50:11.118Z",
-                "discount": 7,
-                "id": "69c22613ae75a98c7cd13b36",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b39",
-                "name": "Knorr Cup Soup 70g",
-                "description": "Convenient and tasty",
-                "price": 30,
-                "originalPrice": 35,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/vnzb2qbwtpab5gnqvx0f.png",
-                "category": "pantry-staples",
-                "unit": "70g",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.118Z",
-                "updatedAt": "2026-03-24T05:50:11.118Z",
-                "discount": 14,
-                "id": "69c22613ae75a98c7cd13b39",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b38",
-                "name": "Maggi Noodles 280g",
-                "description": "Instant and easy to cook",
-                "price": 50,
-                "originalPrice": 55,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/dsep7owmwvfrukzbslqo.png",
-                "category": "pantry-staples",
-                "unit": "280g",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.118Z",
-                "updatedAt": "2026-03-24T05:50:11.118Z",
-                "discount": 9,
-                "id": "69c22613ae75a98c7cd13b38",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b30",
-                "name": "Sprite 1.5L",
-                "description": "Chilled and refreshing, Perfect for celebrations",
-                "price": 60,
-                "originalPrice": 75,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/daiglpvgna1dlhjplbve.png",
-                "category": "beverages",
-                "unit": "1.5L",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.117Z",
-                "updatedAt": "2026-03-24T05:50:11.117Z",
-                "discount": 20,
-                "id": "69c22613ae75a98c7cd13b30",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b23",
-                "name": "Carrot 500g",
-                "description": "Sweet and crunchy, Good for eyesight, Ideal for juices and salads",
-                "price": 44,
-                "originalPrice": 50,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/ceqgisupuizyste9aifg.png",
-                "category": "fruits-vegetables",
-                "unit": "500g",
-                "stock": 100,
-                "isOrganic": True,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.117Z",
-                "updatedAt": "2026-03-24T05:50:11.117Z",
-                "discount": 12,
-                "id": "69c22613ae75a98c7cd13b23",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b2f",
-                "name": "Coca-Cola 1.5L",
-                "description": "Perfect for parties and gatherings, Best served chilled",
-                "price": 75,
-                "originalPrice": 80,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/eljxcdud6fduwfim5rdx.png",
-                "category": "beverages",
-                "unit": "1.5L",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.117Z",
-                "updatedAt": "2026-03-24T05:50:11.117Z",
-                "discount": 6,
-                "id": "69c22613ae75a98c7cd13b2f",
-            },
-            {
-                "_id": "69c22613ae75a98c7cd13b35",
-                "name": "Brown Rice 1kg",
-                "description": "Whole grain and nutritious",
-                "price": 110,
-                "originalPrice": 120,
-                "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/dboutcrkdjhoxcvbbqne.png",
-                "category": "pantry-staples",
-                "unit": "1kg",
-                "stock": 100,
-                "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
-                "__v": 0,
-                "createdAt": "2026-03-24T05:50:11.117Z",
-                "updatedAt": "2026-03-24T05:50:11.117Z",
-                "discount": 8,
-                "id": "69c22613ae75a98c7cd13b35",
-            }
-        ],
+        "categoriesData" : dummyCategoriesData(),
+        "products" : dummyProducts(),
+        "cart" : cart(request)
     }
     return render(request, "Home.html", context=context)
+
+def cart(request):
+    cart = request.session.get("cart", {})
+    cart_items = []
+    cart_total = 0
+    cart_count = 0
+    for product_id, quantity in cart.items():
+        # product = get_object_or_404(Product, id=product_id)
+        for item in dummyProducts():
+            if item["id"] == product_id:
+                product = item
+        total_price = product.price * quantity
+        cart_items.append({
+            "product":product,
+            "quantity":quantity,
+            "total":total_price,
+        })
+        cart_total += total_price
+        cart_count += quantity
+
+    context = {
+        "cart_items":cart_items,
+        "cart_total":cart_total,
+        "cart_count":cart_count,
+    }
+
+    return context
+
+def add_to_cart(request, product_id):
+    for item in dummyProducts():
+        if item["id"] == product_id:
+            product = item
+    cart = request.sessionget("cart",{})
+
+    product_id = str(product_id)
+    
+    if product_id in cart:
+        cart[product_id] += 1
+    else:
+        cart[product_id] = 1
+    request.session['cart'] = cart
+    return redirect("Home")
+
+def remove_from_cart(request, product_id):
+    cart = request.session.get('cart',{})
+
+    product_id = str(product_id)
+
+    if product_id in cart:
+        del cart[product_id]
+
+    request.session['cart'] = cart
+
+    return redirect("Home")
+
+def update_cart(request, product_id):
+    if request.method == "POST":
+        quantity = int(request.POST.get("quantity", 1))
+        cart = request.session.get('cart',{})
+        product_id = str(product_id)
+        if quantity > 0:
+            cart[product_id] = quantity
+        else:
+            cart.pop(product_id, None)
+        request.session['cart'] = cart
+
+    return redirect('Home')
+
+def clear_cart(request):
+    request.session['cart'] = {}
+    return redirect('Home')
+
+
 
 def Products(request):
     return render(request, "Products.html")

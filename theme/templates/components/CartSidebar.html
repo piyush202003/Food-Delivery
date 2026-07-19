@@ -1,0 +1,49 @@
+{% load static %}
+
+<section id="Sidebar" class="hidden">
+    <!-- Overlay -->
+    <div class="fixed inset-0 bg-black-40 z-50 transition-opacity">
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col animate-slid-in-right">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-5 border-b border-zinc-200">
+            <div class="flex items-center gap-2">
+                <img src="{% static 'icons/shopping-bag.svg' %}" class="size-5">
+                <h2 class="text-lg font-medium">Your cart</h2>
+                <span class="px-2 py-0.5 text-xs font-semibold bg-amber-100 rounded-full">{{ cart.cart_count }} Items</span>
+            </div>
+            <button id="Sidebar-cancel-btn" class="hover:cursor-pointer">
+                <img src="{% static 'icons/cancel.svg' %}" class="size-5">
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+            
+            {% if items.length == 0 %}
+                <div class="flex flex-col items-center justify-center h-full text-center">
+                    <img src="{% static 'icons/shopping-bag-grey.svg' %}" class="size-16 md-4">
+                    <h3 class="text-lg font-medium mb-1">Your cart is empty</h3>
+                </div>
+            {% endif %}
+                
+        </div>
+    </div>
+</section>
+
+<script>
+    const sidebarCancelBtn = document.getElementById("Sidebar-cancel-btn");
+    const sidebar = document.getElementById("Sidebar");
+    const sidebarCartBtn = document.getElementById("sidebar-cart-btn");
+    if(sidebarCancelBtn){
+        sidebarCancelBtn.addEventListener("click", () =>{
+            sidebar.classList.add("hidden");
+        })
+    }
+    if(sidebarCancelBtn){
+        sidebarCartBtn.addEventListener("click", ()=>{
+            sidebar.classList.remove("hidden");
+        })
+    }
+</script>
