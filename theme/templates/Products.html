@@ -1,7 +1,214 @@
 {% extends 'AppLayout.html' %}
 {% block title %}InstaCart Products Page{% endblock %}
-
+{% load static %}
 {% block content %}
-    Products
+    <section class="min-h-screen bg-amber-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Breadcrumb -->
+            <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+                <a href="{% url 'Home' %}" class="hover:text-green-500 transition-colors">
+                    <img src="{% static 'icons/home-grey.svg' %}" class="size-4">
+                </a>
+                <span>/</span>
+                <span class="text-green-900 font-medium">
+                {% if category %}
+                    {{ category|upper }}
+                {% else %}
+                    All Products    
+                {% endif %}
+                </span>
+            </nav>
+
+            <div class="flex gap-8 xl:gap-10">
+                <!-- sidebar - desktop -->
+                <aside class="hidden lg:block w-74 shrink-0">
+                    <div class="bg-white rounded-2xl p-4 sticky top-24">
+                        <p>Filter</p>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="flex-1">
+                    <!-- Header -->
+                    <div class="flex items-center justify-between mb-6">
+                       <div>
+                            <h1 class="text-2xl font-semibold text-green-900">
+                            {% if category %}
+                                {{ category|upper }}
+                            {% else %}
+                                All Products
+                            {% endif %}
+                            </h1>
+                            <p class="text-sm text-zinc-400 mt-0.5">
+                                {{ products|length }} products found   
+                            </p>
+                        </div> 
+
+                        <div class="flex flex-col lg:items-center gap-3">
+                            <!-- mobile filter toggle -->
+                            <button id="mobile-filters-btn" class="lg:hidden flex items-center gap-2 px-3 py-2 text-sm bg-white rounded-xl border border-zinc-300 hover:bg-green-200 trnsition-colors">
+                                <img src="{% static 'icons/slider-horizontal-dark.svg' %}" class="size-4"> Filter
+                            </button>
+
+                            <!-- Sort -->
+                            <div class="relative">
+                                <form method="get">
+                                    <select name="sort" onchange="this.form.submit()" class="appearance-none pl-3 pr-8 py-2 text-sm bg-white rounded-xl border border-zinc-200 focus:border-green-900 focus:outline-none cursor-pointer">
+                                        <option value="" {% if not sort %}selected{% endif %}>
+                                            Newest
+                                        </option>
+
+                                        <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>
+                                            Price: Low → High
+                                        </option>
+
+                                        <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>
+                                            Price: High → Low
+                                        </option>
+
+                                        <option value="rating" {% if sort == "rating" %}selected{% endif %}>
+                                            Top Rated
+                                        </option>
+
+                                        <option value="name" {% if sort == "name" %}selected{% endif %}>
+                                            A → Z
+                                        </option>
+                                    </select>
+                                </form>
+
+                                <img src="{% static 'icons/chevron-down.svg' %}" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none">
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Product Grid -->
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 xl:gap-8 ">
+                        {% for product in products %}
+                            <div class="bg-white rounded-2xl overflow-hidden shadow hover:shadow-md transition-all duration-300 group cursor-pointer">
+                                <a href="{% url 'ProductPage' product.id %}">
+                                    <div class="relative aspect-square overflow-hidden">
+                                        <img src="{{ product.image }}" alt="{{ product.name }}" class="w-full h-full object-cover p-4 group-hover:p-2 transition-all duration-300">
+                                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                                            
+                                            {% if product.discount > 0 %}
+                                                <span class="px-2 py-0.5 text-[10px] font-semibold uppercase bg-orange-400 text-white rounded-full">{{ product.discount }}% OFF</span>
+                                            {% endif %}
+                                                
+                                        </div>
+                                    </div>
+                                 
+                                    <div class="p-3.5 text-zinc-700">
+                                        <h3 class="text-sm leading-snug mb-1.5 line-clamp-2">{{ product.name }}</h3>
+                                        
+                                        {% if product.rating > 0 %}
+                                            <div class="flex items-center gap-1 mb-2">
+                                                <img src="{% static 'icons/star.svg' %}" class="size-4">
+                                                <span class="text-xs font-medium text-zinc-600">{{ product.rating }}</span>
+                                                <span class="text-xs text-zinc-400">({{ product.reviewCount }})</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-1 truncate">
+                                                <span class="text-base font-medium">${{ product.price }}</span>
+                                                <span class="text-xs text-zinc-400 block">/{{ product.unit }}</span>
+                                                
+                                                {% if product.originalPrice > product.price %}
+                                                    <span class="text-xs text-zinc-400 line-through ml-1.5">${{ product.originalPrice }}</span>
+                                                {% endif %}
+                                                    
+                                            </div>
+                                            <form action="{% url 'AddToCart' product.id %}" method="POST">
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="size-7 rounded-full bg-orange-300 text-white flex items-center justify-center hover:bg-orange-600 transition-colors active:scale-95"
+                                                >
+                                                    <img
+                                                        src="{% static 'icons/plus-white.svg' %}"
+                                                        class="size-4"
+                                                        alt="Add to cart"
+                                                    >
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                        {% empty %}
+
+                            <div class="col-span-full text-center py-16">
+                                <p class="text-lg font-semibold text-green-900 mb-2">
+                                    No products found
+                                </p>
+
+                                <p class="text-sm text-zinc-400 mb-4">
+                                    Try adjusting your filters or search terms
+                                </p>
+
+                                <button
+                                    class="px-5 py-2 text-sm font-medium bg-green-900 text-white rounded-xl hover:bg-green-600 transition-colors"
+                                >
+                                    Clear Filter
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="flex items-center justify-center gap-2 mt-10">
+
+                        {% if products.has_previous %}
+                            <a
+                                href="?category={{ category }}&organic={{ organic }}&sort={{ sort }}&minPrice={{ min_price }}&maxPrice={{ max_price }}&page={{ page_obj.previous_page_number }}"
+                                class="px-4 py-2 rounded-lg border border-zinc-200 text-sm hover:bg-zinc-100 transition"
+                            >
+                                Previous
+                            </a>
+                        {% endif %}
+
+
+                        {% for num in products.paginator.page_range %}
+
+                            {% if products.number == num %}
+
+                                <span
+                                    class="size-9 flex items-center justify-center rounded-lg bg-green-900 text-white text-sm font-medium"
+                                >
+                                    {{ num }}
+                                </span>
+
+                            {% else %}
+
+                                <a
+                                    href="?category={{ category }}&organic={{ organic }}&sort={{ sort }}&minPrice={{ min_price }}&maxPrice={{ max_price }}&page={{ num }}"
+                                    class="size-9 flex items-center justify-center rounded-lg border border-zinc-200 text-sm hover:bg-zinc-100 transition"
+                                >
+                                    {{ num }}
+                                </a>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+
+                        {% if products.has_next %}
+                            <a
+                                href="?category={{ category }}&organic={{ organic }}&sort={{ sort }}&minPrice={{ min_price }}&maxPrice={{ max_price }}&page={{ page_obj.next_page_number }}"
+                                class="px-4 py-2 rounded-lg border border-zinc-200 text-sm hover:bg-zinc-100 transition"
+                            >
+                                Next
+                            </a>
+                        {% endif %}
+
+                    </div>
+                        
+                </main>
+            </div>
+        </div>
+    </section>
 {% endblock content %}
     

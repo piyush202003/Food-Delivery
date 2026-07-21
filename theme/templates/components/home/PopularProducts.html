@@ -26,33 +26,45 @@
                                     
                             </div>
                         </div>
-                    </a> 
-                    <div class="p-3.5 text-zinc-700">
-                        <h3 class="text-sm leading-snug mb-1.5 line-clamp-2">{{ product.name }}</h3>
-                        
-                        {% if product.rating > 0 %}
-                            <div class="flex items-center gap-1 mb-2">
-                                <img src="{% static 'icons/star.svg' %}" class="size-4">
-                                <span class="text-xs font-medium text-zinc-600">{{ product.rating }}</span>
-                                <span class="text-xs text-zinc-400">({{ product.reviewCount }})</span>
-                            </div>
-                        {% endif %}
-                        
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1 truncate">
-                                <span class="text-base font-medium">${{ product.price }}</span>
-                                <span class="text-xs text-zinc-400 block">/{{ product.unit }}</span>
-                                
-                                {% if product.originalPrice > product.price %}
-                                    <span class="text-xs text-zinc-400 line-through ml-1.5">${{ product.originalPrice }}</span>
-                                {% endif %}
+                    
+                        <div class="p-3.5 text-zinc-700">
+                            <h3 class="text-sm leading-snug mb-1.5 line-clamp-2">{{ product.name }}</h3>
+                            
+                            {% if product.rating > 0 %}
+                                <div class="flex items-center gap-1 mb-2">
+                                    <img src="{% static 'icons/star.svg' %}" class="size-4">
+                                    <span class="text-xs font-medium text-zinc-600">{{ product.rating }}</span>
+                                    <span class="text-xs text-zinc-400">({{ product.reviewCount }})</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1 truncate">
+                                    <span class="text-base font-medium">${{ product.price }}</span>
+                                    <span class="text-xs text-zinc-400 block">/{{ product.unit }}</span>
                                     
+                                    {% if product.originalPrice > product.price %}
+                                        <span class="text-xs text-zinc-400 line-through ml-1.5">${{ product.originalPrice }}</span>
+                                    {% endif %}
+                                        
+                                </div>
+                                <form action="{% url 'AddToCart' product.id %}" method="POST">
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="size-7 rounded-full bg-orange-400 text-white flex items-center justify-center hover:bg-orange-700 transition-colors active:scale-95"
+                                    >
+                                        <img
+                                            src="{% static 'icons/plus-white.svg' %}"
+                                            class="size-4"
+                                            alt="Add to cart"
+                                        >
+                                    </button>
+                                </form>
                             </div>
-                            <a href="{% url 'AddToCart' product.id %}"  class="size-7 rounded-full bg-orange-600 text-white flex items-center justify-center shrink-0 hover:bg-orange-600 transition-colors active:scale-95">
-                                <img src="{% static 'icons/plus-white.svg' %}" class="size-4">
-                            </a>
                         </div>
-                    </div>
+                    </a> 
                 </div>
             {% endfor %}
                 

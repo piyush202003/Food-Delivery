@@ -1,6 +1,6 @@
-from multiprocessing import context
-
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator
+
 from .dummyData import dummyProducts, dummyCategoriesData
 from .models import Product
 
@@ -85,7 +85,6 @@ def update_cart(request, product_id):
         cart = request.session.get("cart", {})
 
         product_id = str(product_id)
-        print("before adding = ", cart[product_id])
 
         if product_id in cart:
 
@@ -98,7 +97,6 @@ def update_cart(request, product_id):
                 if cart[product_id] <= 0:
                     del cart[product_id]
         
-        print("after adding = ", cart[product_id])
         request.session["cart"] = cart
 
     return redirect("Home")
@@ -110,7 +108,51 @@ def clear_cart(request):
 
 
 def Products(request):
-    return render(request, "Products.html")
+    category = request.GET.get("category", "")
+    organic = request.GET.get("organic", "")
+    sort = request.GET.get("sort", "")
+    min_price = request.GET.get("minPrice", "")
+    max_price = request.GET.get("maxPrice", "")
+
+    products_data = dummyProducts()
+    let = []
+    if category:
+        for item in products_data:
+            if item['category'] == category:
+                let.append(item)
+    if organic == 'true':
+        products_data = products_data.filter(is_organic=True)
+    if min_price:
+        products_data = products_data.filter(price__gte=min_price)
+    if max_price:
+        prodcuts_data = prodcuts_data.filter(price_lte=max_price)
+
+    if sort == "price_asc":
+        products_data = products_data.order_by('price')
+    elif sort == 'price_desc':
+        products_data = products_data.order_by("-price")
+    elif sort == 'rating':
+        products_data = products_data.order_by("-rating")
+    elif sort == "newest":
+        products_data = products_data.order_by("-created_at")
+
+    paginator = Paginator(let, 4)
+
+    page_number = request.GET.get("page")
+
+    let = paginator.get_page(page_number)
+
+    context = {
+        "cart" : cart(request),
+        # 'products': products_data,
+        'products': let,
+        'category':category, 
+        'organic':organic,
+        'sort':sort,
+        'min_price':min_price,
+        'max_price':max_price,
+    }
+    return render(request, "Products.html", context=context)
 
 def ProductPage(request,pdid):
     context = {'pdid': pdid}

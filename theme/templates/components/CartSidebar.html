@@ -14,7 +14,7 @@
                 <h2 class="text-lg font-medium">Your cart</h2>
                 <span class="px-2 py-0.5 text-xs font-semibold bg-amber-100 rounded-full">{{ cart.cart_count }} Items</span>
             </div>
-            <button id="Sidebar-cancel-btn" class=" p-2 hover:cursor-pointer hover:bg-amber-200">
+            <button id="Sidebar-cancel-btn" class=" p-2 hover:cursor-pointer hover:bg-amber-200 rounded">
                 <img src="{% static 'icons/cancel.svg' %}" class="size-5">
             </button>
         </div>
@@ -64,12 +64,13 @@
                                         $ {{ item.total }}
                                     </span>
                                     <a href="{% url 'RemoveFromCart' item.product.id %}" class="p-1">
-                                        <img 
+                                        <!-- <img 
                                             src="{% static 'icons/trash-grey.svg' %}"
                                             onmouseover="this.src='{% static 'icons/trash-red.svg' %}'"
                                             onmouseout="this.src='{% static 'icons/trash-grey.svg' %}'"
                                             class="size-6"
-                                        >
+                                        > -->
+                                        <!-- <img src="{% static 'icons/trash-grey.svg' %}" class="size-6 hover:bg-red-200 hover:rounded"> -->
                                     </a>
                                 </div>
                             </div>
