@@ -19,6 +19,7 @@
     --color-amber-100: oklch(96.2% 0.059 95.617);
     --color-amber-200: oklch(92.4% 0.12 95.746);
     --color-green-200: oklch(92.5% 0.084 155.995);
+    --color-green-400: oklch(79.2% 0.209 151.711);
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-700: oklch(52.7% 0.154 150.069);
@@ -427,6 +428,9 @@
   .w-4 {
     width: calc(var(--spacing) * 4);
   }
+  .w-6 {
+    width: calc(var(--spacing) * 6);
+  }
   .w-56 {
     width: calc(var(--spacing) * 56);
   }
@@ -788,6 +792,9 @@
   .pt-1 {
     padding-top: calc(var(--spacing) * 1);
   }
+  .pt-3 {
+    padding-top: calc(var(--spacing) * 3);
+  }
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
   }
@@ -876,6 +883,9 @@
   }
   .text-gray-500 {
     color: var(--color-gray-500);
+  }
+  .text-green-400 {
+    color: var(--color-green-400);
   }
   .text-green-800 {
     color: var(--color-green-800);

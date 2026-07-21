@@ -1,3 +1,5 @@
+from multiprocessing import context
+
 from django.shortcuts import render, redirect, get_object_or_404
 from .dummyData import dummyProducts, dummyCategoriesData
 from .models import Product
@@ -22,19 +24,27 @@ def cart(request):
         for item in dummyProducts():
             if item["id"] == product_id:
                 product = item
-        total_price = product.price * quantity
-        cart_items.append({
-            "product":product,
-            "quantity":quantity,
-            "total":total_price,
-        })
-        cart_total += total_price
-        cart_count += quantity
+        # total_price = product.price * quantity
+        if product:
+            total_price = product['price'] * quantity
+            cart_items.append({
+                "product":product,
+                "quantity":quantity,
+                "total":total_price,
+            })
+            cart_total += total_price
+            cart_count += 1
+    
+    delivery_fee = 0
+    if cart_total <= 20:
+        delivery_fee = 1.99
 
     context = {
         "cart_items":cart_items,
         "cart_total":cart_total,
         "cart_count":cart_count,
+        "grand_total": cart_total + delivery_fee,
+        "delivery_fee":delivery_fee,
     }
 
     return context
@@ -43,8 +53,8 @@ def add_to_cart(request, product_id):
     for item in dummyProducts():
         if item["id"] == product_id:
             product = item
-    cart = request.sessionget("cart",{})
-
+    cart = request.session.get("cart",{})
+    
     product_id = str(product_id)
     
     if product_id in cart:
@@ -75,6 +85,7 @@ def update_cart(request, product_id):
         cart = request.session.get("cart", {})
 
         product_id = str(product_id)
+        print("before adding = ", cart[product_id])
 
         if product_id in cart:
 
@@ -86,7 +97,8 @@ def update_cart(request, product_id):
 
                 if cart[product_id] <= 0:
                     del cart[product_id]
-
+        
+        print("after adding = ", cart[product_id])
         request.session["cart"] = cart
 
     return redirect("Home")
@@ -112,7 +124,10 @@ def FlashDeals(request):
 
 # from here all are needed authentication verification
 def Checkout(request):
-    return render(request, "Checkout.html")
+    context = {
+        "cart":cart(request),
+    }
+    return render(request, "Checkout.html", context=context)
 
 def MyOrders(request):
     return render(request, "MyOrders.html")
