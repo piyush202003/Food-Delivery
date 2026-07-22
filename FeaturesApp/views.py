@@ -62,7 +62,7 @@ def add_to_cart(request, product_id):
     else:
         cart[product_id] = 1
     request.session['cart'] = cart
-    return redirect("Home")
+    return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 def remove_from_cart(request, product_id):
     cart = request.session.get('cart',{})
@@ -74,7 +74,7 @@ def remove_from_cart(request, product_id):
 
     request.session['cart'] = cart
 
-    return redirect("Home")
+    return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 def update_cart(request, product_id):
 
@@ -99,11 +99,11 @@ def update_cart(request, product_id):
         
         request.session["cart"] = cart
 
-    return redirect("Home")
+    return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 def clear_cart(request):
     request.session['cart'] = {}
-    return redirect('Home')
+    return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 
 
@@ -115,11 +115,15 @@ def Products(request):
     max_price = request.GET.get("maxPrice", "")
 
     products_data = dummyProducts()
+    categories = [{'slug':"", 'name':'All Categories'}] + dummyCategoriesData()
+
     let = []
     if category:
         for item in products_data:
             if item['category'] == category:
                 let.append(item)
+    else:
+        let = products_data
     if organic == 'true':
         products_data = products_data.filter(is_organic=True)
     if min_price:
@@ -136,7 +140,7 @@ def Products(request):
     elif sort == "newest":
         products_data = products_data.order_by("-created_at")
 
-    paginator = Paginator(let, 4)
+    paginator = Paginator(let, 12)
 
     page_number = request.GET.get("page")
 
@@ -147,6 +151,7 @@ def Products(request):
         # 'products': products_data,
         'products': let,
         'category':category, 
+        'categories':categories,
         'organic':organic,
         'sort':sort,
         'min_price':min_price,

@@ -125,14 +125,29 @@
     const sidebarCancelBtn = document.getElementById("Sidebar-cancel-btn");
     const sidebar = document.getElementById("Sidebar");
     const sidebarCartBtn = document.getElementById("sidebar-cart-btn");
-    if(sidebarCancelBtn){
-        sidebarCancelBtn.addEventListener("click", () =>{
-            sidebar.classList.add("hidden");
-        })
-    }
-    if(sidebarCancelBtn){
-        sidebarCartBtn.addEventListener("click", ()=>{
+
+    // Open sidebar
+    if (sidebarCartBtn) {
+        sidebarCartBtn.addEventListener("click", () => {
             sidebar.classList.remove("hidden");
-        })
+
+            // Remember that sidebar is open
+            sessionStorage.setItem("cartSidebarOpen", "true");
+        });
+    }
+
+    // Close sidebar
+    if (sidebarCancelBtn) {
+        sidebarCancelBtn.addEventListener("click", () => {
+            sidebar.classList.add("hidden");
+
+            // Remember that sidebar is closed
+            sessionStorage.removeItem("cartSidebarOpen");
+        });
+    }
+
+    // After page reload, check if sidebar was previously open
+    if (sessionStorage.getItem("cartSidebarOpen") === "true") {
+        sidebar.classList.remove("hidden");
     }
 </script>
