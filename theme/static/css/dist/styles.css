@@ -21,6 +21,7 @@
     --color-amber-50: oklch(98.7% 0.022 95.277);
     --color-amber-100: oklch(96.2% 0.059 95.617);
     --color-amber-200: oklch(92.4% 0.12 95.746);
+    --color-yellow-200: oklch(94.5% 0.129 101.54);
     --color-green-200: oklch(92.5% 0.084 155.995);
     --color-green-400: oklch(79.2% 0.209 151.711);
     --color-green-500: oklch(72.3% 0.219 149.579);
@@ -90,7 +91,6 @@
     --animate-slide-in-right: slide-in-right 0.3s ease-out;
     --animate-slide-in-up: slide-in-up 0.3s ease-out;
     --animate-slide-out-right: slide-out-right 0.3s ease-in;
-    --animate-slide-out-down: slide-out-down 0.3s ease-in;
   }
 }
 @layer base {
@@ -800,6 +800,12 @@
   .bg-center {
     background-position: center;
   }
+  .fill-white {
+    fill: var(--color-white);
+  }
+  .fill-yellow-200 {
+    fill: var(--color-yellow-200);
+  }
   .object-contain {
     object-fit: contain;
   }
@@ -1056,6 +1062,9 @@
     @supports (color: color-mix(in lab, red, red)) {
       color: color-mix(in oklab, var(--color-white) 80%, transparent);
     }
+  }
+  .text-yellow-200 {
+    color: var(--color-yellow-200);
   }
   .text-zinc-300 {
     color: var(--color-zinc-300);
@@ -1989,16 +1998,6 @@
   to {
     opacity: 0;
     transform: translateX(100%);
-  }
-}
-@keyframes slide-out-down {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-100%);
   }
 }
 @layer properties {

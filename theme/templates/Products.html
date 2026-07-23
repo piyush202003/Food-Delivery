@@ -124,58 +124,8 @@
                     
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 xl:gap-8 ">
                         {% for product in products %}
-                            <div class="bg-white rounded-2xl overflow-hidden shadow hover:shadow-md transition-all duration-300 group cursor-pointer">
-                                <a href="{% url 'ProductPage' product.id %}">
-                                    <div class="relative aspect-square overflow-hidden">
-                                        <img src="{{ product.image }}" alt="{{ product.name }}" class="w-full h-full object-cover p-4 group-hover:p-2 transition-all duration-300">
-                                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                                            
-                                            {% if product.discount > 0 %}
-                                                <span class="px-2 py-0.5 text-[10px] font-semibold uppercase bg-orange-400 text-white rounded-full">{{ product.discount }}% OFF</span>
-                                            {% endif %}
-                                                
-                                        </div>
-                                    </div>
-                                 
-                                    <div class="p-3.5 text-zinc-700">
-                                        <h3 class="text-sm leading-snug mb-1.5 line-clamp-2">{{ product.name }}</h3>
-                                        
-                                        {% if product.rating > 0 %}
-                                            <div class="flex items-center gap-1 mb-2">
-                                                <img src="{% static 'icons/star.svg' %}" class="size-4">
-                                                <span class="text-xs font-medium text-zinc-600">{{ product.rating }}</span>
-                                                <span class="text-xs text-zinc-400">({{ product.reviewCount }})</span>
-                                            </div>
-                                        {% endif %}
-                                        
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-1 truncate">
-                                                <span class="text-base font-medium">${{ product.price }}</span>
-                                                <span class="text-xs text-zinc-400 block">/{{ product.unit }}</span>
-                                                
-                                                {% if product.originalPrice > product.price %}
-                                                    <span class="text-xs text-zinc-400 line-through ml-1.5">${{ product.originalPrice }}</span>
-                                                {% endif %}
-                                                    
-                                            </div>
-                                            <form action="{% url 'AddToCart' product.id %}" method="POST">
-                                                {% csrf_token %}
-
-                                                <button
-                                                    type="submit"
-                                                    class="size-7 rounded-full bg-orange-300 text-white flex items-center justify-center hover:bg-orange-600 transition-colors active:scale-95"
-                                                >
-                                                    <img
-                                                        src="{% static 'icons/plus-white.svg' %}"
-                                                        class="size-4"
-                                                        alt="Add to cart"
-                                                    >
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </a>
-                            </div>
+                            
+                            {% include 'components/ProductCard.html' with product=product %}
 
                         {% empty %}
 
