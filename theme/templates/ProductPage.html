@@ -2,6 +2,71 @@
 {% block title %}InstaCart Product Page{% endblock %}
 
 {% block content %}
-    Product Page of Product ID: {{ pdid }}
+    <div class="min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Bread Crumb -->
+            <nav class="flex items-center gap-2 text-sm text-zinc-400 mb-6">
+                <a href="{% url 'Home' %}" class="hover:text-green-900 transition-colors">
+                    <i data-lucide="home" class="size-4"></i>
+                </a>
+                <span>/</span>
+                <a href="{% url 'Products' %}" class="hover:text-green-900 transition-colors">
+                    Products
+                </a>
+                <span>/</span>
+                <a href="{% url 'Products' %}?category={{ product.category }}" class="hover:text-green-900 transition-colors">
+                    {{ categoryLabel|upper }}
+                </a>
+                <span>/</span>
+                <span class="text-green-900 font-medium truncate max-w-[200px]">{{ product.name }}</span>
+            </nav>
+
+            <!-- Back Button -->
+            <button onclick="history.back()" class="mb-6 flex items-center gap-1.5 text-sm text-gray-400 hover:text-green-900 transition-colors">
+                <i data-lucide="arrow-left" class="size-4"></i> Back
+            </button>
+
+            <!-- Product Details -->
+            <div class="bg-white/50 rounded-2xl overflow-hidden">
+                <div class="grid md:grid-cols-2 gap-0">
+                    <!-- Left Side -->
+                    <div class="relative flex items-center justify-center p-8 md:p-12 min-h-[320px] md:min-h-[480px]">
+                        <img src="{{ product.image }}" alt="{{ product.name }}" class="max-h-[360px] w-auto object-contain">
+                    
+                        <!-- Badges -->
+                        <div class="absolute top-5 left-5 flex flex-wrap gap-1.5">
+                            
+                            {% if product.isOrganic %}
+                                <span class="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-green-900 text-white rounded-full">
+                                    <i data-lucide="leaf" class="w-3 h-3"></i>
+                                </span>
+                            {% endif %}
+                            
+                            {% if product.discount > 0 %}
+                                <span class="px-2.5 py-1 text-xs font-semibold bg-orange-400 text-white rounded-full">
+                                    {{ product.discount }}% OFF
+                                </span>
+                            {% endif %}
+                                
+                                
+                        </div>
+                    </div>
+
+                    
+
+                    <!-- Right Side -->
+                    <div>
+                        
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- Cutomer Reviews -->
+
+            <!-- Related Products -->
+
+        </div>
+    </div>
 {% endblock content %}
     

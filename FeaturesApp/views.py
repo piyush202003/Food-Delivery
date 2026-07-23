@@ -176,11 +176,21 @@ def ProductPage(request,pdid):
     for pd in products:
         if pd['id'] != pdid:
             relatedProducts.append(pd)
-             
+
+    cartData = cart(request)
+    # product_id = str(product.id)
+    cartQuantity = cartData.get(pdid, 0)
+    inCart = pdid in cartData
+    categoryLabel = product['category'].replace("-", " ")
+
     context={
         'pdid': pdid,
         'product':product,
         'relatedProducts':relatedProducts,
+        'cart': cartData,
+        'cartQuantity': cartQuantity,
+        'inCart': inCart,
+        'categoryLabel': categoryLabel,
     }
     return render(request, "ProductPage.html", context=context)
 
