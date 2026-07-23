@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
+from django.template import context
 
 from .dummyData import dummyProducts, dummyCategoriesData
 from .models import Product
@@ -167,7 +168,11 @@ def SearchResults(request):
     return render(request, "SearchResults.html")
 
 def FlashDeals(request):
-    return render(request, "FlashDeals.html")
+    # filter for product.stock > 0
+    context={
+        'products':dummyProducts(),
+    }
+    return render(request, "FlashDeals.html", context=context)
 
 # from here all are needed authentication verification
 def Checkout(request):

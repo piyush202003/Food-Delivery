@@ -43,6 +43,25 @@
                                     
                             </div>
                         </div>
+
+                        <!-- Price Range -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-green-900 mb-3">Price Range</h3>
+                            <div class="flex items-center gap-2">
+                                <input type="number" placeholder="Min" name="minPrice" class="w-full px-3 py-2 text-sm bg-white rounded-lg border not-focus:border-zinc-300">
+                                <span class="text-zinc-400">-</span>
+                                <input type="number" placeholder="Max" name="maxPrice" class="w-full px-3 py-2 text-sm bg-white rounded-lg border not-focus:border-zinc-300">
+                            </div>
+                        </div>
+
+                        <!-- Clear all filters -->
+                         <a href="{% url 'Products' %}" >
+                            <button class="w-full py-2 text-sm text-red-400 hover:bg-red-50 rounded-lg transition-colors font-medium cursor-pointer">
+                                Clear All Filters
+                            </button>
+                        </a>
+                        
+                        
                     </div>
                 </aside>
 
@@ -169,11 +188,11 @@
                                     Try adjusting your filters or search terms
                                 </p>
 
-                                <button
-                                    class="px-5 py-2 text-sm font-medium bg-green-900 text-white rounded-xl hover:bg-green-600 transition-colors"
-                                >
-                                    Clear Filter
-                                </button>
+                                <a href="{% url 'Products' %}">
+                                    <button class="px-5 py-2 text-sm font-medium bg-green-900 text-white rounded-xl hover:bg-green-600 transition-colors">
+                                        Clear Filter
+                                    </button>
+                                </a>
                             </div>
                         {% endfor %}
                     </div>
@@ -228,6 +247,87 @@
                 </main>
             </div>
         </div>
+
+        <!-- Mobile Filters Model -->
+        <div class="hidden" id="mobile-filter">
+            <div class="fixed inset-0 bg-black/40 z-50" id="bg-cl-mobile-filter"/>
+
+            <div id="mobile-filter-bottom" class="fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-2xl max-h-[80vh] overflow-y-auto animate-slide-in-up">
+                <div class="flex items-center justify-between p-4 border-b border-zinc-400">
+                    <h3 class="text-lg font-semibold text-green-900">Filters</h3>
+                    <button id="cancel-mobile-filter-btn" class="p-2 hover:bg-amber-100 rounded-lg">
+                        <img src="{% static 'icons/cancel.svg' %}" class="size-5">
+                    </button>
+                </div>
+                <div class="bg-white rounded-2xl p-4 sticky top-24 space-y-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-green-900 mb-3">Categories</h3>
+                        <div class="space-y-1.5">
+                            
+                            {% for cat in categories %}
+                                
+                                {% if cat.slug == category %}
+                                    <a href="{% url 'Products' %}?category={{ cat.slug }}" class="block w-full text-left px-3 py-2 text-sm rounded-md transition-all bg-green-600 text-white">
+                                        {{ cat.name }}
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'Products' %}?category={{ cat.slug }}" class="block w-full text-left px-3 py-3 text-sm rounded-mb transition-all text-zinc-500 hover:bg-amber-100">
+                                        {{ cat.name }}
+                                    </a>
+                                {% endif %}
+                                    
+                            {% endfor %}
+                                
+                        </div>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div>
+                        <h3 class="text-sm font-semibold text-green-900 mb-3">Price Range</h3>
+                        <div class="flex items-center gap-2">
+                            <input type="number" placeholder="Min" name="minPrice" class="w-full px-3 py-2 text-sm bg-white rounded-lg border not-focus:border-zinc-300">
+                            <span class="text-zinc-400">-</span>
+                            <input type="number" placeholder="Max" name="maxPrice" class="w-full px-3 py-2 text-sm bg-white rounded-lg border not-focus:border-zinc-300">
+                        </div>
+                    </div>
+
+                    <!-- Clear all filters -->
+                        <a href="{% url 'Products' %}" >
+                        <button class="w-full py-2 text-sm text-red-400 hover:bg-red-50 rounded-lg transition-colors font-medium cursor-pointer">
+                            Clear All Filters
+                        </button>
+                    </a>
+                    
+                </div>
+            </div>
+
+        </div>
+
     </section>
+    <script>
+        const mobileFilterBtn = document.getElementById("mobile-filters-btn");
+        const mobileFilter = document.getElementById("mobile-filter");
+        const cancelMobileFilterBtn = document.getElementById("cancel-mobile-filter-btn");
+        const bgClMobileFilter = document.getElementById("bg-cl-mobile-filter");
+        const mobileFilterBottom = document.getElementById("mobile-filter-bottom");
+
+        if(mobileFilterBtn){
+            mobileFilterBtn.addEventListener("click",()=>{
+                mobileFilter.classList.remove('hidden');
+            });
+        }
+        
+        if(cancelMobileFilterBtn){
+            cancelMobileFilterBtn.addEventListener("click", ()=>{
+                mobileFilter.classList.add('hidden');
+            });
+        }
+
+        if(bgClMobileFilter){
+            bgClMobileFilter.addEventListener("click", ()=>{
+                mobileFilter.classList.add('hidden');
+            });
+        }
+    </script>
 {% endblock content %}
     

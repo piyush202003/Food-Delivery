@@ -2,11 +2,11 @@
 
 <section id="Sidebar" class="hidden">
     <!-- Overlay -->
-    <div class="fixed inset-0 bg-black-40 z-50 transition-opacity">
+    <div class="fixed inset-0 bg-black/40 z-50" id="bg-cl-cart-sidebar">
     </div>
     
     <!-- Sidebar -->
-    <div class="fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col animate-slid-in-right">
+    <div class="fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col rounded-t-2xl" id="cart-sidebar-right">
         <!-- Header -->
         <div class="flex items-center justify-between p-5 border-b border-zinc-200">
             <div class="flex items-center gap-2">
@@ -125,11 +125,14 @@
     const sidebarCancelBtn = document.getElementById("Sidebar-cancel-btn");
     const sidebar = document.getElementById("Sidebar");
     const sidebarCartBtn = document.getElementById("sidebar-cart-btn");
+    const bgClCartSidebar = document.getElementById("bg-cl-cart-sidebar");
+    const cartSidebarRight = document.getElementById("cart-sidebar-right");
 
     // Open sidebar
     if (sidebarCartBtn) {
         sidebarCartBtn.addEventListener("click", () => {
             sidebar.classList.remove("hidden");
+            cartSidebarRight.classList.add('animate-slide-in-right');
 
             // Remember that sidebar is open
             sessionStorage.setItem("cartSidebarOpen", "true");
@@ -139,8 +142,33 @@
     // Close sidebar
     if (sidebarCancelBtn) {
         sidebarCancelBtn.addEventListener("click", () => {
-            sidebar.classList.add("hidden");
+            cartSidebarRight.classList.remove('animate-slide-in-right');
+            cartSidebarRight.classList.add('animate-slide-out-right');
+            setTimeout(() => {
 
+                sidebar.classList.add("hidden");
+
+                cartSidebarRight.classList.remove("animate-slide-out-right");
+
+            }, 300);
+
+            // Remember that sidebar is closed
+            sessionStorage.removeItem("cartSidebarOpen");
+        });
+    }
+
+    if (bgClCartSidebar) {
+        bgClCartSidebar.addEventListener("click", () => {
+            
+            cartSidebarRight.classList.remove('animate-slide-in-right');
+            cartSidebarRight.classList.add('animate-slide-out-right');
+            setTimeout(() => {
+
+                sidebar.classList.add("hidden");
+
+                cartSidebarRight.classList.remove("animate-slide-out-right");
+
+            }, 300);
             // Remember that sidebar is closed
             sessionStorage.removeItem("cartSidebarOpen");
         });
@@ -149,5 +177,6 @@
     // After page reload, check if sidebar was previously open
     if (sessionStorage.getItem("cartSidebarOpen") === "true") {
         sidebar.classList.remove("hidden");
+        cartSidebarRight.classList.add('animate-slide-in-right');
     }
 </script>
