@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from django.template import context
+from django.contrib import messages
 
 from .dummyData import dummyProducts, dummyCategoriesData
 from .models import Product
@@ -161,8 +161,28 @@ def Products(request):
     return render(request, "Products.html", context=context)
 
 def ProductPage(request,pdid):
-    context = {'pdid': pdid}
-    return render(request, "ProductPage.html", {"context":context})
+    products = dummyProducts()
+    product = {}
+    for pd in products:
+        if pd['id'] == pdid:
+            product = pd
+            break
+
+    if not product:
+        messages.error(request, f"Product with Product Id = {pdid} is not present in data base")
+        return redirect(request.META.get("HTTP_REFERER", "Products"))
+    
+    relatedProducts = []
+    for pd in products:
+        if pd['id'] != pdid:
+            relatedProducts.append(pd)
+             
+    context={
+        'pdid': pdid,
+        'product':product,
+        'relatedProducts':relatedProducts,
+    }
+    return render(request, "ProductPage.html", context=context)
 
 def SearchResults(request):
     return render(request, "SearchResults.html")
