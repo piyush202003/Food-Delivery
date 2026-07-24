@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib import messages
+from numpy import dtype
 
-from .dummyData import dummyProducts, dummyCategoriesData
+from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown
 from .models import Product
 
 # Create your views here.
@@ -177,20 +178,26 @@ def ProductPage(request,pdid):
         if pd['id'] != pdid:
             relatedProducts.append(pd)
 
-    cartData = cart(request)
+    cartData = request.session.get("cart",{})
     # product_id = str(product.id)
-    cartQuantity = cartData.get(pdid, 0)
+    displayQuantity = cartData.get(pdid, 0)
     inCart = pdid in cartData
     categoryLabel = product['category'].replace("-", " ")
+
+    reviews = generate_dummy_reviews(product)
+    breakdown = get_rating_breakdown(reviews)
 
     context={
         'pdid': pdid,
         'product':product,
         'relatedProducts':relatedProducts,
-        'cart': cartData,
-        'cartQuantity': cartQuantity,
+        'cart': cart(request),
+        'displayQuantity': displayQuantity,
         'inCart': inCart,
         'categoryLabel': categoryLabel,
+        'reviews':reviews,
+        'breakdown':breakdown,
+        'maxRatingCount':max(breakdown),
     }
     return render(request, "ProductPage.html", context=context)
 

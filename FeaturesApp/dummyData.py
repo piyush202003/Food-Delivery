@@ -1,3 +1,7 @@
+from datetime import timedelta
+from django.utils import timezone
+import random
+
 def dummyProducts():
     return [
             {
@@ -7,7 +11,7 @@ def dummyProducts():
                 "price": 45,
                 "originalPrice": 50,
                 "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/zvoeqbvrbrt7atqj0dbu.png",
-                "category": "bakery",
+                "category": "bakery",    
                 "unit": "100g",
                 "stock": 100,
                 "isOrganic": False,
@@ -28,7 +32,7 @@ def dummyProducts():
                 "image": "https://raw.githubusercontent.com/avinashdm/gs-images/main/greencart/cxrrgnf12xuhkr4dyhi2.png",
                 "category": "pantry-staples",
                 "unit": "500g",
-                "stock": 100,
+                "stock":100,
                 "isOrganic": True,
                 "rating": 4.5,
                 "reviewCount": 12,
@@ -205,3 +209,103 @@ def dummyCategoriesData():
             { "slug": "baby-care", "name": "Baby Care", "image": "baby_care" },
             { "slug": "dairy-eggs", "name": "Dairy & Eggs", "image": "dairy_eggs" },
         ]
+
+
+REVIEWERS = [
+    { "name": "Ananya S.", "avatar": "AS" },
+    { "name": "Rahul M.", 'avatar': "RM" },
+    { "name": "Priya K.", "avatar": "PK" },
+    { "name": "Vikram J.", "avatar": "VJ" },
+    { "name": "Meera D.", "avatar": "MD" },
+    { "name": "Arjun R.", 'avatar': "AR" },
+    { "name": "Sneha T.", 'avatar': "ST" },
+    { "name": "Karan P.", 'avatar': "KP" },
+]
+
+COMMENTS = [
+    "Absolutely love this product! Fresh and great quality. Will definitely order again.",
+    "Good value for the price. Packaging was neat and delivery was on time.",
+    "Quality is decent but I expected it to be a bit fresher. Still a solid buy overall.",
+    "This has become a staple in my kitchen now. Highly recommended for everyone!",
+    "Exceeded my expectations. The taste and freshness were top-notch. Five stars!",
+    "Pretty good! Not the absolute best I've had, but definitely worth the price.",
+    "Arrived in perfect condition. Very satisfied with the purchase, ordering more soon.",
+    "Great product, my family loved it. The organic quality really shows in the taste.",
+]
+
+def generate_dummy_reviews(product):
+    
+    # Create a local random generator
+    # based on product ID
+    rng = random.Random(str(product['id']))
+    # rng = random.Random(str(product.id))
+
+    count = min(product['reviewCount'], 6)
+    # count = min(product.review_count, 6)
+
+    days_ago = [
+        3,
+        7,
+        14,
+        21,
+        35,
+        48,
+    ]
+
+    reviews = []
+
+    for i in range(count):
+
+        reviewer = REVIEWERS[
+            (rng.randint(0, len(REVIEWERS) - 1) + i)
+            % len(REVIEWERS)
+        ]
+
+        # Generate rating around product rating
+        
+        rating = round(product['rating']+(rng.random()-0.5)*2)
+        # rating = round(
+        #     product.rating + (rng.random() - 0.5) * 2
+        # )
+
+        # Keep rating between 3 and 5
+        rating = max(
+            3,
+            min(5, rating)
+        )
+
+        date = timezone.now() - timedelta(
+            days=days_ago[i % len(days_ago)]
+        )
+
+        comment = COMMENTS[
+            (rng.randint(0, len(COMMENTS) - 1) + i)
+            % len(COMMENTS)
+        ]
+
+        helpful = rng.randint(1, 20)
+
+        reviews.append({
+            "id": i,
+            "name": reviewer["name"],
+            "avatar": reviewer["avatar"],
+            "rating": rating,
+            "date": date,
+            "comment": comment,
+            "helpful": helpful,
+        })
+
+    return reviews
+
+def get_rating_breakdown(reviews):
+
+    counts = [0, 0, 0, 0, 0]
+
+    for review in reviews:
+
+        rating = review["rating"]
+
+        counts[rating - 1] += 1
+
+    # 5 → 1
+    return counts[::-1]
