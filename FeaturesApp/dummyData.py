@@ -110,8 +110,8 @@ def dummyProducts():
                 "unit": "280g",
                 "stock": 100,
                 "isOrganic": False,
-                "rating": 4.5,
-                "reviewCount": 12,
+                "rating": 4,
+                "reviewCount": 22,
                 "__v": 0,
                 "createdAt": "2026-03-24T05:50:11.118Z",
                 "updatedAt": "2026-03-24T05:50:11.118Z",
@@ -240,8 +240,9 @@ def generate_dummy_reviews(product):
     rng = random.Random(str(product['id']))
     # rng = random.Random(str(product.id))
 
-    count = min(product['reviewCount'], 6)
+    # count = min(product['reviewCount'], 6)
     # count = min(product.review_count, 6)
+    count = product['reviewCount']
 
     days_ago = [
         3,
@@ -262,7 +263,7 @@ def generate_dummy_reviews(product):
         ]
 
         # Generate rating around product rating
-        
+
         rating = round(product['rating']+(rng.random()-0.5)*2)
         # rating = round(
         #     product.rating + (rng.random() - 0.5) * 2

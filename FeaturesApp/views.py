@@ -175,7 +175,7 @@ def ProductPage(request,pdid):
     
     relatedProducts = []
     for pd in products:
-        if pd['id'] != pdid:
+        if pd['id'] != pdid and pd['category'] == product['category']:
             relatedProducts.append(pd)
 
     cartData = request.session.get("cart",{})
