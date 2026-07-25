@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib import messages
-from numpy import dtype
 
-from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown
+from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors
 from .models import Product
 
 # Create your views here.
@@ -219,7 +218,24 @@ def Checkout(request):
     return render(request, "Checkout.html", context=context)
 
 def MyOrders(request):
-    return render(request, "MyOrders.html")
+
+    activeTab = request.GET.get('activeTab','All Orders')
+    orders = dummyDashboardOrdersData()
+    statusCol = statusColors()
+    # print(statusCol)
+    for order in orders:
+        order['statusColour'] = statusCol[order['status']]
+        order['itemsExtraCount'] = len(order['items']) - 4
+
+    context={
+        'cart':cart(request),
+        'orders':orders,
+        'tabs':['All Orders', 'Placed', 'Out For Delivery', 'Delivered'],
+        'activeTab':activeTab,
+        'statusColours':statusColors(),
+
+    }
+    return render(request, "MyOrders.html", context=context)
 
 def OrderTracking(request, odid):
     return render(request, "OrderTracking.html", {"odid" : odid})
