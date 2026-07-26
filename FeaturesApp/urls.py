@@ -15,5 +15,5 @@ urlpatterns = [
     path("cart/remove/<str:product_id>/", remove_from_cart, name="RemoveFromCart"),
     path("cart/update/<str:product_id>/", update_cart, name="UpdateCart"),
     path("cart/clear/", clear_cart, name="ClearCart"),
-    
+    path('api/order/<str:odid>/update-location/', update_driver_location, name='update_driver_location'),
 ]

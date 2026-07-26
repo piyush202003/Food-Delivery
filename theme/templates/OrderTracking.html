@@ -1,7 +1,80 @@
 {% extends 'AppLayout.html' %}
 {% block title %}InstaCart Order Tracking Page{% endblock %}
+{% load static %}
 
 {% block content %}
-    Order Tracking
+    <div class="min-h-screen mb-20 bg-amber-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Header -->
+            <a href="{% url 'MyOrders' %}">
+                <button class="flex items-center gap-2 text0sm text-zinc-400 hover:text-green-900 mb-6 transition-colors">
+                    <i data-lucide="arrow-left" class="size-4"></i>
+                    Back to Orders
+                </button>
+            </a>
+
+            <!-- Order id, date, status -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-2xl font-semibold text-green-900">Order #{{ order.id|slice:'-8:'|upper }}</h1>
+                    <p class="text-sm text-gray-400 mt-1">Placed on {{ order.createdAt|slice:':10' }}</p>
+                </div>
+                <span class="px-4 py-1.5 text-sm font-semibold rounded-full 
+                {% if order.status == 'Delivered' %}
+                    bg-green-100 text-green-900
+                {% elif order.status == 'Cancelled' %}
+                    bg-red-100 text-red-700
+                {% else %}
+                    bg-orange-700/10 text-orange-700
+                {% endif %}
+                ">
+                    {{ order.status }}
+                </span>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6">
+                
+                <!-- left side Timeline + Map Area -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- otp card -->
+                    {% if showOtp %}
+                        {% include 'components/orderTracking/OrderOTP.html' %}
+                    {% endif %}
+                    
+                    <!-- Live Tracking Map -->
+                    {% include 'components/orderTracking/LiveMap.html' %}
+
+                    <!-- Progress Timeline -->
+                    {% include 'components/orderTracking/OrderTimeLine.html' %}
+
+                    <!-- Delivery Person -->
+                    {% if order.deliveryPartner and order.status != 'Delivered' and order.status != 'Cancelled' %}
+                        <div class="bg-white rounded-2xl p-5 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="size-11 rounded-full bg-green-900 flex items-center justify-center">
+                                    <span class="text-white font-semibold text-sm">{{ order.deliveryPartner.name|first|upper }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm fonnt-semibold text-green-900">{{ order.deliveryPartner.name }}</p>
+                                    <p class="text-xs text-zinc-400 capitalize">{{ order.deliveryPartner.vehicleType }} Delivery Partner</p>
+                                </div>
+                            </div>
+                            <a href="tel:{{ order.delivveryPartner.phone }}" class="p-2.5 bg-amber-50 rounded-xl hover:bg-amber-200 transition-colors">
+                                <i data-lucide="phone" class="size-4 text-zinc-400"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                        
+                </div>
+
+                <!-- Right side Order Details -->
+                <div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock content %}
     

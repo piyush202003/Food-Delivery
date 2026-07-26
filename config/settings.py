@@ -20,6 +20,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,11 +33,21 @@ INSTALLED_APPS += [
     'django_browser_reload',
     "tailwind",
     "theme",
+    'channels',
     'accounts',
     "FeaturesApp",
 ]
 
 TAILWIND_APP_NAME = "theme"
+
+ASGI_APPLICATION = 'config.asgi.application'
+
+# In-memory channel layer (use Redis channel layer in production)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

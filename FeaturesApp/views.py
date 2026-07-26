@@ -238,7 +238,119 @@ def MyOrders(request):
     return render(request, "MyOrders.html", context=context)
 
 def OrderTracking(request, odid):
-    return render(request, "OrderTracking.html", {"odid" : odid})
+    order = {}
+    allStatus = ['Placed', 'Confirmed', 'Assigned', 'Packed', 'Out for Delivery', 'Delivered']
+    statusCol = statusColors()
+    for od in dummyDashboardOrdersData():
+        if od['id'] == odid:
+            order = od
+            order['statusColour'] = statusCol[order['status']]
+            break
+
+    if not order:
+        messages.error(request, "There is no order with order id = ", odid)
+        return redirect(request.META.get("HTTP_REFERER", "MyOrders"))
+
+    showOtp = order['deliveryOtp'] and order['status'] in allStatus[2:5]
+
+    liveLocation = None
+    if order['status'] in allStatus[2:5]:
+        liveLocation = order['liveLocation']
+
+    statusIcons = {
+        "Placed": "clock",
+        "Confirmed": "check",
+        "Assigned": "truck",
+        "Packed": "package",
+        "Out for Delivery": "truck",
+        "Delivered": "check",
+    }
+    statusHistory = {
+        history['status']: history['timestamp']
+        for history in order['statusHistory']
+    }
+
+    def get_timestamp(status):
+        for his in order['statusHistory']:
+            if his['status'] == status:
+                return his['timestamp']
+
+    allStatusInfo = [
+        {
+            'status':'Placed',
+            'icon':'clock',
+            'timestamp': get_timestamp('Placed')
+        },{
+            'status':'Confirmed',
+            'icon':'check',
+            'timestamp': get_timestamp('Confirmed')
+        },{
+            'status':'Assigned',
+            'icon':'truck',
+            'timestamp': get_timestamp('Assigned')
+        },{
+            'status':'Packed',
+            'icon':'package',
+            'timestamp': get_timestamp('Packed')
+        },{
+            'status':'Out for Delivery',
+            'icon':'truck',
+            'timestamp': get_timestamp('Out for Delivery')
+        },{
+            'status':'Delivered',
+            'icon':'check',
+            'timestamp': get_timestamp('Delivered')
+        }
+    ]
+
+    context={
+        "order":order,
+        'liveLocation': None,
+        'showOtp': showOtp,
+        'liveLocation':liveLocation,
+        'allStatus':allStatus,
+        'statusIcons': statusIcons,
+        'currentIdx':allStatus.index(order['status']),
+        'statusHistory':statusHistory,
+        'allStatusInfo':allStatusInfo,
+    }
+    return render(request, "OrderTracking.html", context=context)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+import json
+
+@csrf_exempt  # Remove @csrf_exempt if passing CSRF header/token from app
+def update_driver_location(request, odid):
+    """
+    Endpoint called by driver's mobile app or GPS tracker to push location updates.
+    """
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            lat = float(data.get("lat"))
+            lng = float(data.get("lng"))
+
+            # 1. Broadcast the new location to WebSocket subscribers
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"order_{odid}",
+                {
+                    "type": "location_update",
+                    "lat": lat,
+                    "lng": lng,
+                }
+            )
+
+            # 2. Optionally update your DB / cache here if needed...
+
+            return JsonResponse({"status": "success", "lat": lat, "lng": lng})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+    return JsonResponse({"status": "invalid_method"}, status=405)
 
 def Addresses(request):
     return render(request, "Addresses.html")
