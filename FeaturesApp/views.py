@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib import messages
 
-from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors
+from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors, dummyAddressData
 from .models import Product
 
 # Create your views here.
@@ -353,4 +353,19 @@ def update_driver_location(request, odid):
     return JsonResponse({"status": "invalid_method"}, status=405)
 
 def Addresses(request):
-    return render(request, "Addresses.html")
+    context = {
+        'addresses': dummyAddressData(),
+    }
+    return render(request, "Addresses.html", context=context)
+
+def AddressDelete(request, addid):
+    addresses = dummyAddressData()
+
+    # Address.objects.filter(id=addid).delete()
+    for address in addresses:
+        if address['id'] == addid:
+            del address['id']
+            break
+    print(addresses)
+    
+    return redirect(request.META.get("HTTP_REFERER", "Addresses"))
