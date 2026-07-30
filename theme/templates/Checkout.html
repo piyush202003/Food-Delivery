@@ -2,6 +2,70 @@
 {% block title %}InstaCart Checkout Page{% endblock %}
 
 {% block content %}
-    Checkout
+    
+    {% if cart.cart_items|length == 0 %}
+        <div class="min-h-screen bg-amber-50 flex items-center justify-center">
+            <div class="text-center">
+                <h2 class="text-xl font-semibold text-green-900 mb-2">Your cart is empty</h2>
+                <p class="text-sm text-zinc-400 mb-4">Add some products to checkout</p>
+                <a href="{% url 'Products' %}">
+                    <button class="px-5 py-2.5 bg-green-900 text-white text-sm font-medium rounded-xl hover:bg-green-600 transition-colors">
+                        Browse Products
+                    </button>
+                </a>
+            </div>
+        </div>    
+    {% else %}
+        <div class="min-h-screen bg-amber-50">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Back Button -->
+                <button onclick="history.back()" class="flex items-center gap-2 text-sm text-zinc-400 hover:text-green-900 mb-6 transition-colors">
+                    <i data-lucide="arrow-left" class="size-4"></i>
+                    Back
+                </button>
+
+                <h1 class="text-2xl font-semibold text-green-900 mb-8">Checkout</h1>
+                
+                <div class="flex items-center gap-2 mb-8">
+                    
+                    {% for s in steps %}
+                        <div class="flex items-center gap-2">
+                            <a href="{% url 'Checkout' %}?step={{ s.key }}">
+                                <button class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer
+                                {% if step == s.key %}
+                                    bg-green-900 text-white
+                                {% else %}
+                                    bg-white text-zinc-400 hover:border hover:border-zinc-400
+                                {% endif %}
+                                ">
+                                    <i data-lucide="{{ s.icon }}" class="size-4"></i>
+                                    {{ s.label }}
+                                    {% if forloop.counter < steps|length %}
+                                        <i data-lucide="chevron-right" class="size-4"></i>
+                                    {% endif %}
+                                        
+                                </button>
+                            </a>
+                        </div>
+                    {% endfor %}
+                        
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Main Form -->
+                    <div class="md:col-span-2">
+                        {% if step == 'address' %}
+                            {% include 'components/Checkout/CheckoutAddress.html' %}
+                        {% elif step == 'payment' %}
+                            {% include 'components/Checkout/CheckoutPayment.html' %}
+                        {% elif step == 'review' %}
+                            {% include 'components/Checkout/CheckoutReview.html' %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+        
 {% endblock content %}
     

@@ -212,8 +212,75 @@ def FlashDeals(request):
 
 # from here all are needed authentication verification
 def Checkout(request):
+    cartData = cart(request)
+
+    user = {
+        'addresses':dummyAddressData(),
+    }
+    address = {
+        'id':'',
+        'label':'Home',
+        'address':'',
+        'city':'',
+        'state':'',
+        'zip':'',
+        'isDefault':False,
+        'lat':0,
+        'lng':0
+    }
+
+    newAdd = request.GET.get('addrId','')
+    prevAdd = request.session.get('addrId','')
+    for add in user['addresses']:
+        if newAdd:
+            if add['id'] == newAdd:
+                address = add
+                request.session['addrId'] = add['id']
+                break
+        elif prevAdd:
+            if add['id'] == prevAdd:
+                address = add
+                request.session['addrId'] = add['id']
+                break
+        else:
+            if add['isDefault']:
+                address = add
+                request.session['addrId'] = add['id']
+                break
+    address = request.GET.get('address', address)
+
+    paymentMethod = request.session.get("paymentMethod", "cash")
+
+    if request.method == "POST":
+        paymentMethod = request.POST.get("payment_method")
+
+        request.session["paymentMethod"] = paymentMethod
+
+
+    deliveryFee = 0
+    if cartData['cart_total'] <= 20:
+        deliveryFee = 1.99
+    tax = cartData['cart_total'] * 0.08
+    total = cartData['cart_total'] + deliveryFee + tax
+
+    step = request.GET.get("step", "address")
+    steps = [
+        {'key':'address', 'label':'Address', 'icon':'map-pin'},
+        {'key':'payment', 'label':'Payment', 'icon':'credit-card'},
+        {'key':'review', 'label':'Review', 'icon':'check'},
+    ]
+    
+
     context = {
-        "cart":cart(request),
+        "cart":cartData,
+        'user':user,
+        'address':address,
+        'paymentMethod':paymentMethod,
+        'deliveryFee':deliveryFee,
+        'tax':tax,
+        'total':total,
+        'step':step,
+        'steps':steps,
     }
     return render(request, "Checkout.html", context=context)
 

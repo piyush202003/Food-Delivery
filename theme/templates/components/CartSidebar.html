@@ -64,7 +64,7 @@
                                         $ {{ item.total }}
                                     </span>
                                     <a href="{% url 'RemoveFromCart' item.product.id %}" class="p-1">
-                                        <i data-lucide="trash" class="size-5 text-gray-400 hover:text-red-400 hover:rounded"></i>
+                                        <i data-lucide="trash-2" class="size-5 text-gray-400 hover:text-red-400 hover:rounded"></i>
                                         <!-- <img 
                                             src="{% static 'icons/trash-grey.svg' %}"
                                             onmouseover="this.src='{% static 'icons/trash-red.svg' %}'"
@@ -112,8 +112,11 @@
                     <span>$ {{ cart.grand_total }}</span>
                 </div>
 
-                <a href="{% url 'Checkout' %}" class="w-full py-3 bg-orange-400 text-white font-semibold rounded-xl hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 active:scale-[0.98]">
-                    Proceed to Checkoutt <img src="{% static 'icons/right-arrow-white.svg' %}" class="size-6">
+                <a id="cart-checkout-btn" href="{% url 'Checkout' %}">
+                    <button class="w-full py-3 bg-orange-400 text-white font-semibold rounded-xl hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 active:scale-[0.98]">
+                        Proceed to Checkout
+                        <i data-lucide="arrow-right" class="size-6"></i>
+                    </button>
                 </a>
             </div>
         {% endif %}
@@ -127,7 +130,7 @@
     const sidebarCartBtn = document.getElementById("sidebar-cart-btn");
     const bgClCartSidebar = document.getElementById("bg-cl-cart-sidebar");
     const cartSidebarRight = document.getElementById("cart-sidebar-right");
-
+    const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
     // Open sidebar
     if (sidebarCartBtn) {
         sidebarCartBtn.addEventListener("click", () => {
@@ -169,6 +172,23 @@
                 cartSidebarRight.classList.remove("animate-slide-out-right");
 
             }, 300);
+            // Remember that sidebar is closed
+            sessionStorage.removeItem("cartSidebarOpen");
+        });
+    }
+
+    if(cartCheckoutBtn){
+        cartCheckoutBtn.addEventListener("click", () => {
+            cartSidebarRight.classList.remove('animate-slide-in-right');
+            cartSidebarRight.classList.add('animate-slide-out-right');
+            setTimeout(() => {
+
+                sidebar.classList.add("hidden");
+
+                cartSidebarRight.classList.remove("animate-slide-out-right");
+
+            }, 300);
+
             // Remember that sidebar is closed
             sessionStorage.removeItem("cartSidebarOpen");
         });
