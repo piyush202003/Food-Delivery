@@ -8,6 +8,8 @@ urlpatterns = [
     path("__reload__/",include("django_browser_reload.urls")),
     path("account/", include("accounts.urls")),
     path("",include("FeaturesApp.urls")),
+    path('admin/', include('AdminPanal.urls')),
+    path('delivery/', include('DeliveryPartner.urls')),
 ]
 
 if settings.DEBUG:
