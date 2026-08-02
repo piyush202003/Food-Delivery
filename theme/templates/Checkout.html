@@ -62,6 +62,33 @@
                             {% include 'components/Checkout/CheckoutReview.html' %}
                         {% endif %}
                     </div>
+
+                    <!-- Order Summary Sidebar -->
+                    <div class="bg-white rounded-2xl p-5 h-fit sticky top-24">
+                        <h3 class="text-sm font-semibold text-zinc-400 mb-4">order Summary</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-zinc-400">Subtotal {{ cart.cart_items|length }} items</span>
+                                <span>$ {{ cart.cart_total }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-zinc-400">Delivery</span>
+                                {% if deliveryFee == 0 %}
+                                    <span class="text-green-500">Free</span>
+                                {% else %}
+                                    <span>$ {{ deliferyFee }}</span>    
+                                {% endif %}
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-zinc-400">Tax</span>
+                                <span>$ {{ tax }}</span>
+                            </div>
+                            <div class="flex justify-between pt-3 border-t border-zinc-400 text-base font-semibold">
+                                <span>Total</span>
+                                <span class="text-green-900">$ {{ total }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

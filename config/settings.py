@@ -36,6 +36,8 @@ INSTALLED_APPS += [
     'channels',
     'accounts',
     "FeaturesApp",
+    'DeliveryPartner',
+    'AdminPanal',
 ]
 
 TAILWIND_APP_NAME = "theme"

@@ -201,7 +201,22 @@ def ProductPage(request,pdid):
     return render(request, "ProductPage.html", context=context)
 
 def SearchResults(request):
-    return render(request, "SearchResults.html")
+    cartData = cart(request)
+
+    search = request.GET.get('search','')
+
+    products = dummyProducts()
+    resultProducts = []
+    for product in products:
+        if search in product['name'].lower():
+            resultProducts.append(product)
+
+    context = {
+        'search':search,
+        'products': resultProducts,
+        'cart': cartData,
+    }
+    return render(request, "SearchResults.html", context=context)
 
 def FlashDeals(request):
     # filter for product.stock > 0
