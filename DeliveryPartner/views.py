@@ -52,7 +52,15 @@ def DeliveryDashboard(request):
 
     submitting = False
 
-    cancelModal = None
+    cancelModal = request.GET.get("cancelModal",'')
+    if cancelModal:
+        if cancelModal == 'None':
+            request.session['deliveryPartnerCancelModal'] = None
+            cancelModal = None
+        else:
+            request.session['deliveryPartnerCancelModal'] = cancelModal
+    else:
+        cancelModel = request.session.get('deliveryPartnerCancelModal')
     cancelReason = None
 
     context={
