@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.urls import path,include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('supperAdmin/', admin.site.urls),
     path("__reload__/",include("django_browser_reload.urls")),
     path("account/", include("accounts.urls")),
     path("",include("FeaturesApp.urls")),

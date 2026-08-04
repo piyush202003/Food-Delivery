@@ -7,5 +7,6 @@ urlpatterns = [
     path('products/new/', AdminProductForm, name='AdminProductForm'),
     path('products/<str:id>/edit/', AdminProductForm, name='AdminProductFormEdit'),
     path('orders/', AdminOrders, name='AdminOrders'),
-    path('delivery-partners/', AdminDeliveryPartners, name='AdminDeliveryPartners'),    
+    path('delivery-partners/', AdminDeliveryPartners, name='AdminDeliveryPartners'),
+    path('logout/', AdminLogout, name='AdminLogout'),    
 ]
