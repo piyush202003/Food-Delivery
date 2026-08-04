@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect
 
 from AdminPanal.dummyData import dummy_admin_dashboard_data
+from DeliveryPartner.dummyData import dummy_delivery_partner_data
+from FeaturesApp.dummyData import dummyDashboardOrdersData
 
 
 # Create your views here.
@@ -48,13 +50,37 @@ def AdminProductForm(request):
     return render(request, 'admin/AdminProductForm.html', context=context)
 
 def AdminOrders(request):
+    orders = dummyDashboardOrdersData()
+    partners = dummy_delivery_partner_data()
+    statusOptions = ["Placed", "Confirmed", "Assigned", "Packed", "Out for Delivery", "Delivered", "Cancelled"]
+
+    assignModal = request.GET.get('assignModal')
+    if assignModal :
+        if assignModal == 'None':
+            request.session['assignModal'] = None
+            assignModal = None
+        else:
+            request.session['assignModal'] = assignModal
+            selectedPartner = ''
+    else:
+        assignModal = request.session.get('assignModal')
+    selectedPartner = ''
+    
     context={
         'AdminLinkData':AdminLinkData,
+        'orders':orders,
+        'partners':partners,
+        'statusOptions':statusOptions,
+        'selectedPartner':selectedPartner,
     }
     return render(request, 'admin/AdminOrders.html', context=context)
 
 def AdminDeliveryPartners(request):
+
+    partners = dummy_delivery_partner_data()
+
     context={
         'AdminLinkData':AdminLinkData,
+        'partners':partners,
     }
     return render(request, 'admin/AdminDeliveryPartners.html', context=context)
