@@ -1,9 +1,12 @@
 from django.contrib import messages
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 
 from AdminPanal.dummyData import dummy_admin_dashboard_data
 from DeliveryPartner.dummyData import dummy_delivery_partner_data
-from FeaturesApp.dummyData import dummyDashboardOrdersData
+from FeaturesApp.dummyData import dummyCategoriesData, dummyDashboardOrdersData, dummyProducts
+from FeaturesApp.models import Product
+
+from .forms import AdminProductForms
 
 
 # Create your views here.
@@ -44,9 +47,28 @@ def AdminProducts(request):
     }
     return render(request, 'admin/AdminProducts.html', context=context)
 
-def AdminProductForm(request):
+def AdminProductForm(request, id=None):
+    product=None
+
+    if id:
+        product = get_object_or_404(Product, id=id)
+
+    if request.method == "POST":
+        form = AdminProductForms(request.POST, request.FILES, instance=Product,)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Product saved successfully')
+            return redirect('AdminProducts')
+    else:
+        form = AdminProductForms(instance=product)
+
     context={
         'AdminLinkData':AdminLinkData,
+        'isEdit':product is not None,
+        'categoriesData':dummyCategoriesData(),
+        'form':form,
+        'product':product,
     }
     return render(request, 'admin/AdminProductForm.html', context=context)
 
