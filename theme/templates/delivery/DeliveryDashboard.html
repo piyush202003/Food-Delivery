@@ -10,7 +10,7 @@
         <div class="flex items-center gap-2 flex-wrap">
             
             <a href="?tab=active">
-                <button class="px-4 py-2 text-sm font-medium rounded-xl transition-colors
+                <button class="px-4 py-2 text-sm font-medium rounded-xl transition-colors cursor-pointer
                 {% if tab == 'active' %}
                     bg-green-900 text-white
                 {% else %}
@@ -21,7 +21,7 @@
                 </button>
             </a>
             <a href="?tab=completed">
-                <button class="px-4 py-2 text-sm font-medium rounded-xl transition-colors
+                <button class="px-4 py-2 text-sm font-medium rounded-xl transition-colors cursor-pointer
                 {% if tab == 'completed' %}
                     bg-green-900 text-white
                 {% else %}
@@ -33,7 +33,7 @@
             </a>
             <div class="ml-auto">
                 <a href="?tracking={% if tracking %}0{% else %}1{% endif %}">
-                    <button class="px-4 py-2 text-sm font-medium rounded-xl transition-colors flex items-center gap-1.5 
+                    <button class="px-4 py-2 text-sm font-medium rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer
                     {% if tracking %}
                         bg-green-600 text-white
                     {% else %}

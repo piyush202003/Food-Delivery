@@ -838,6 +838,11 @@
       border-color: var(--color-amber-50);
     }
   }
+  .divide-amber-100 {
+    :where(& > :not(:last-child)) {
+      border-color: var(--color-amber-100);
+    }
+  }
   .divide-zinc-300 {
     :where(& > :not(:last-child)) {
       border-color: var(--color-zinc-300);
@@ -1318,6 +1323,9 @@
   }
   .pb-16 {
     padding-bottom: calc(var(--spacing) * 16);
+  }
+  .pb-20 {
+    padding-bottom: calc(var(--spacing) * 20);
   }
   .pl-3 {
     padding-left: calc(var(--spacing) * 3);
@@ -1868,6 +1876,13 @@
       }
     }
   }
+  .hover\:bg-green-950 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-green-950);
+      }
+    }
+  }
   .hover\:bg-indigo-100 {
     &:hover {
       @media (hover: hover) {
@@ -1996,6 +2011,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-green-900);
+      }
+    }
+  }
+  .hover\:text-orange-300 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-orange-300);
       }
     }
   }

@@ -14,7 +14,8 @@ class AdminProductForms(forms.ModelForm):
             }),
 
             "category": forms.Select(attrs={
-                "class": "w-full px-4 py-2.5 rounded-xl border border-zinc-300 bg-white focus:border-green-900 outline-none focus:ring-1 focus:ring-app-green transtion-all bg-white"
+                "class": "w-full px-4 py-2.5 rounded-xl border border-zinc-300 bg-white focus:border-green-900 outline-none focus:ring-1 focus:ring-app-green transtion-all bg-white",
+                'empty_label':"Select a category"
             }),
 
             "price": forms.NumberInput(attrs={

@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import render,redirect, get_object_or_404
+from httpx import RequestError
 
 from AdminPanal.dummyData import dummy_admin_dashboard_data
 from DeliveryPartner.dummyData import dummy_delivery_partner_data
@@ -42,8 +43,15 @@ def AdminDashboard(request):
     return render(request, 'admin/AdminDashboard.html', context=context)
 
 def AdminProducts(request):
+
+    products = dummyProducts()
+    productId = request.GET.get('productId','')
+    if productId:
+        messages.warning(request,f'Product #{productId[-6:].upper()} is set for stock out')
+
     context={
         'AdminLinkData':AdminLinkData,
+        'products':products,
     }
     return render(request, 'admin/AdminProducts.html', context=context)
 
