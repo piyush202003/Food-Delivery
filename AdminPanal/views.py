@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render,redirect
 
 from AdminPanal.dummyData import dummy_admin_dashboard_data
@@ -54,6 +55,15 @@ def AdminOrders(request):
     partners = dummy_delivery_partner_data()
     statusOptions = ["Placed", "Confirmed", "Assigned", "Packed", "Out for Delivery", "Delivered", "Cancelled"]
 
+    selectedPartner = ''
+    if request.method == 'POST':
+        if 'assignPartner' in request.POST:
+            selectedPartner = request.POST.get('partner')
+    
+        if selectedPartner:
+            assignModal = request.session.get('assignModal')
+            messages.success(request, f"Order #{assignModal[-6:].upper()} has been assigned to #{selectedPartner[-6:].upper()} successfully.")
+
     assignModal = request.GET.get('assignModal')
     if assignModal :
         if assignModal == 'None':
@@ -64,14 +74,16 @@ def AdminOrders(request):
             selectedPartner = ''
     else:
         assignModal = request.session.get('assignModal')
-    selectedPartner = ''
+    
     
     context={
         'AdminLinkData':AdminLinkData,
         'orders':orders,
         'partners':partners,
         'statusOptions':statusOptions,
+        'assignModal':assignModal,
         'selectedPartner':selectedPartner,
+
     }
     return render(request, 'admin/AdminOrders.html', context=context)
 
