@@ -10,6 +10,9 @@
     {% tailwind_css %}
 </head>
 <body>
+
+    {% include 'components/Messages.html' %}
+
     <div class="min-h-screen flex">
         <!-- Left Side -->
         <div class="hidden lg:flex lg:w-1/2 bg-green-800 relative items-center justify-center">
@@ -50,17 +53,33 @@
                     </p>
                 </div>
                 <!-- login/register form -->
-                <form action="post" class="space-y-5">
+                <form method="POST" class="space-y-5">
                     {% csrf_token %}
                 
-                    {% if is_login %}
+                    {% if not is_login %}
                         <label for="" class="text-sm flex flex-col gap-1">
-                            Name
+                            Username
                             <div class="relative">
                                 <i data-lucide="users" class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-gray-500"></i>
-                                <input type="text" name="name" required placeholder="Your name" class="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+                                <input type="text" name="username" required placeholder="Enter Username (must be unique)" class="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
                             </div>
                         </label>
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <label for="" class="flex flex-col flex-1 text-sm gap-1">
+                                First Name
+                                <div class="relative">
+                                    <i data-lucide="users" class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-gray-500"></i>
+                                    <input type="text" name="firstname" required placeholder="Enter Username (must be unique)" class="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+                                </div>
+                            </label>
+                            <label for="" class="flex flex-col flex-1 text-sm gap-1">
+                                Last Name
+                                <div class="relative">
+                                    <i data-lucide="users" class="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-gray-500"></i>
+                                    <input type="text" name="lastname" required placeholder="Enter Username (must be unique)" class="w-full pl-11 pr-4 py-3 text-sm bg-white rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all">
+                                </div>
+                            </label>
+                        </div>
                     {% endif %}
                     <label for="" class="text-sm flex flex-col gap-1">
                         Email Address
