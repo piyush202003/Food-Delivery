@@ -7,21 +7,29 @@ class Category(models.Model):
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to="categories/")
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.name
+    
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='ProductCategory')
     name = models.CharField(max_length=200)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    original_price = models.DecimalField(max_digits=10, decimal_places=2)
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     image = models.ImageField(upload_to="products/")
-    unit = models.CharField(max_length=20)
-    stock = models.IntegerField()
+    unit = models.CharField(max_length=30, default='piece')
+    stock = models.IntegerField(default=0)
     is_organic = models.BooleanField(default=False)
     rating = models.FloatField(default=0)
     review_count = models.IntegerField(default=0)
     discount = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 class CartItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="CartUser")
@@ -35,25 +43,50 @@ class DeliveryPartner(models.Model):
         ("car", "Car"),
     ]
     name = models.CharField(max_length=100)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     phone = models.CharField(max_length=15)
-    avatar = models.ImageField(upload_to="deliveryPartner/")
-    vehicle_type = models.CharField(max_length=20, choices=VEHICLE_TYPES)
+    password = models.CharField(max_length=128)
+    avatar = models.ImageField(upload_to="deliveryPartner/", blank=True, null=True)
+    vehicle_type = models.CharField(max_length=20, choices=VEHICLE_TYPES, default='bike')
     is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 class Order(models.Model):
+    STATUS_CHOICES = (
+        ("Placed", "Placed"),
+        ("Confirmed", "Confirmed"),
+        ("Packed", "Packed"),
+        ("Out for Delivery", "Out for Delivery"),
+        ("Delivered", "Delivered"),
+        ("Cancelled", "Cancelled"),
+    )
+
+    PAYMENT_METHODS = (
+        ("card", "Card"),
+        ("cash", "Cash"),
+    )
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="OrderUser")
     shipping_address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name="OrderAddress")
-    payment_method = models.CharField(max_length=30)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='card')
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
-    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2)
-    tax = models.DecimalField(max_digits=10, decimal_places=2)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=30)
-    delivery_partenr = models.ForeignKey(DeliveryPartner, on_delete=models.CASCADE, null=True, blank=True, related_name="OrderDeliveryPartner")
-    delivery_otp = models.CharField(max_length=6)
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Placed')
+    delivery_partenr = models.ForeignKey(DeliveryPartner, on_delete=models.SET_NULL, null=True, blank=True, related_name="OrderDeliveryPartner")
+    delivery_otp = models.CharField(max_length=6, blank=True, default='')
+    live_location = models.JSONField(blank=True, null=True)
     is_paid = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.id)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
