@@ -13,13 +13,9 @@ def login_view(request):
         email = request.POST['email']
         password = request.POST['password']
 
-        user = authenticate(
-            request,
-            email=email,
-            password=password
-        )
+        user = authenticate( request, email=email, password=password)
 
-        if user is not None:
+        if user:
             messages.success(request, f'User with username {user.username} successfully Logged In.')
             login(request, user)
             return redirect('Home')

@@ -11,9 +11,9 @@
                 
                 {% comment %} Nav Links - Desktop {% endcomment %}
                 <div class="hidden md:flex items-center gap-6 text-sm text-zinc-600 font-medium">
-                    <a href="{% url 'Home' %}">Home</a>
-                    <a href="{% url 'Products' %}">Products</a>
-                    <a href="{% url 'FlashDeals' %}" class="text-orange-400">Deals</a>
+                    <a href="{% url 'Home' %}" class="cursor-pointer">Home</a>
+                    <a href="{% url 'Products' %}" class="cursor-pointer">Products</a>
+                    <a href="{% url 'FlashDeals' %}" class="text-orange-400 cursor-pointer">Deals</a>
                 </div>
 
                 {% comment %} Search {% endcomment %}
@@ -38,19 +38,19 @@
                     {% comment %} User {% endcomment %}
                     <div class="relative">
                         {% if user.is_authenticated %}
-                            <button id="menu-btn-lg-screen" class="flex items-center gap-2 p-2">
+                            <button id="menu-btn-lg-screen" class="flex items-center gap-2 p-2 cursor-pointer">
                                 <div class="size-7 rounded-full bg-green-900 text-white flex items-center justify-center">
-                                    {{ user.username|first|upper }}
+                                    {{ user.first_name|first|upper }}
                                 </div>
                                 <img id="chevron-icon" src="{% static 'icons/chevron-down.svg' %}" class="size-4 transition-transform duration-200 ease-in-out">
                             </button>
                         {% else %}
                             <div class="flex items-center justify-center gap-2">
-                                <a href="{% url 'Login' %}" class="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-900 rounded-full hover:bg-green-600 transition-colors">
+                                <a href="{% url 'Login' %}" class="hidden md:flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-900 rounded-full hover:bg-green-600 transition-colors cursor-pointer">
                                     <img src="{% static 'icons/user-circle-white.svg' %}" class="size-6">
                                     Sign In
                                 </a>
-                                <button id="menu-btn" class="md:hidden">
+                                <button id="menu-btn" class="md:hidden cursor-pointer">
                                     <img id="menu-icon" src="{% static 'icons/menu-dark.svg' %}" class="size-6">
                                 </button>
                             </div>
@@ -60,7 +60,7 @@
                             <div class="absolute right-0 mt-2.5 w-56 bg-white rounded-xl shadow-lg border py-2 z-50 animate-fade-in">
                                 {% if user.is_authenticated %}
                                     <div class="px-4 py-2 border-b border-zinc-200">
-                                        <p class="text-sm font-medium text-zinc-800">{{ user.username }}</p>
+                                        <p class="text-sm font-medium text-zinc-800">{{ user.first_name }} {{ user.last_name }}</p>
                                         <p class="text-xs text-zinc-500">{{ user.email }}</p>
                                     </div>
                                 {% endif %}
