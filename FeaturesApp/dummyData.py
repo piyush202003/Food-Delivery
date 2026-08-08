@@ -237,12 +237,12 @@ def generate_dummy_reviews(product):
     
     # Create a local random generator
     # based on product ID
-    rng = random.Random(str(product['id']))
+    rng = random.Random(product.id)
     # rng = random.Random(str(product.id))
 
     # count = min(product['reviewCount'], 6)
     # count = min(product.review_count, 6)
-    count = product['reviewCount']
+    count = product.review_count
 
     days_ago = [
         3,
@@ -264,7 +264,7 @@ def generate_dummy_reviews(product):
 
         # Generate rating around product rating
 
-        rating = round(product['rating']+(rng.random()-0.5)*2)
+        rating = round(product.rating+(rng.random()-0.5)*2)
         # rating = round(
         #     product.rating + (rng.random() - 0.5) * 2
         # )

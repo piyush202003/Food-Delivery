@@ -26,13 +26,13 @@ def cart(request):
     cart_total = 0
     cart_count = 0
     for product_id, quantity in cart.items():
-        # product = get_object_or_404(Product, id=product_id)
-        for item in dummyProducts():
-            if item["id"] == product_id:
-                product = item
+        product = get_object_or_404(Product, id=product_id)
+        # for item in dummyProducts():
+        #     if item["id"] == product_id:
+        #         product = item
         # total_price = product.price * quantity
         if product:
-            total_price = product['price'] * quantity
+            total_price = product.price * quantity
             cart_items.append({
                 "product":product,
                 "quantity":quantity,
@@ -56,9 +56,7 @@ def cart(request):
     return context
 
 def add_to_cart(request, product_id):
-    for item in dummyProducts():
-        if item["id"] == product_id:
-            product = item
+    product = get_object_or_404(Product, id=product_id)
     cart = request.session.get("cart",{})
     
     product_id = str(product_id)
@@ -129,8 +127,6 @@ def Products(request):
     min_price = request.GET.get("minPrice", request.session.get('productsMin_price', ''))
     max_price = request.GET.get("maxPrice", request.session.get('productsMax_price', ''))
 
-    print(request.GET.get('minPrice'))
-
     products_data = Product.objects.all()
     categories = Category.objects.all()
 
@@ -182,27 +178,19 @@ def Products(request):
     return render(request, "Products.html", context=context)
 
 def ProductPage(request,pdid):
-    products = dummyProducts()
-    product = {}
-    for pd in products:
-        if pd['id'] == pdid:
-            product = pd
-            break
+    product = get_object_or_404(Product, id=pdid)
 
     if not product:
         messages.error(request, f"Product with Product Id = {pdid} is not present in data base")
         return redirect(request.META.get("HTTP_REFERER", "Products"))
     
-    relatedProducts = []
-    for pd in products:
-        if pd['id'] != pdid and pd['category'] == product['category']:
-            relatedProducts.append(pd)
+    relatedProducts = Product.objects.filter(category=product.category).exclude(id=pdid)[:8]
 
     cartData = request.session.get("cart",{})
     # product_id = str(product.id)
     displayQuantity = cartData.get(pdid, 0)
     inCart = pdid in cartData
-    categoryLabel = product['category'].replace("-", " ")
+    
 
     reviews = generate_dummy_reviews(product)
     breakdown = get_rating_breakdown(reviews)
@@ -214,7 +202,6 @@ def ProductPage(request,pdid):
         'cart': cart(request),
         'displayQuantity': displayQuantity,
         'inCart': inCart,
-        'categoryLabel': categoryLabel,
         'reviews':reviews,
         'breakdown':breakdown,
         'maxRatingCount':max(breakdown),
