@@ -1443,6 +1443,9 @@
   .text-blue-800 {
     color: var(--color-blue-800);
   }
+  .text-gray-300 {
+    color: var(--color-gray-300);
+  }
   .text-gray-400 {
     color: var(--color-gray-400);
   }
@@ -2123,16 +2126,6 @@
   .focus\:border-green-500 {
     &:focus {
       border-color: var(--color-green-500);
-    }
-  }
-  .focus\:border-green-600 {
-    &:focus {
-      border-color: var(--color-green-600);
-    }
-  }
-  .focus\:border-green-800 {
-    &:focus {
-      border-color: var(--color-green-800);
     }
   }
   .focus\:border-green-900 {

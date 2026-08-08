@@ -18,7 +18,7 @@
             {% for item in cart.cart_items %}
                 <div class="flex items-center justify-between m-2">
                     <div class="flex items-center gap-1">
-                        <img src="{{ item.product.image }}" alt="{{ item.product.name }}" class="size-15">
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="size-15">
                         <div class="flex-1">
                             <h4 class="text-sm font-semibold text-green-900">{{ item.product.name }}</h4>
                             <span class="text-xs text-zinc-400">Qty: {{ item.quantity }}</span>

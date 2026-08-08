@@ -39,11 +39,7 @@
                     <form action="{% url 'AddToCart' product.id %}" method="POST">
                         {% csrf_token %}
 
-                        <button
-                            type="submit"
-                            class="size-7 rounded-full bg-orange-300 text-white flex items-center justify-center hover:bg-orange-600 transition-colors active:scale-95"
-                        >
-                            <!-- <img src="{% static 'icons/plus-white.svg' %}" class="size-4" alt="Add to cart"> -->
+                        <button type="submit" class="size-7 rounded-full bg-orange-300 text-white flex items-center justify-center hover:bg-orange-600 transition-colors active:scale-95">
                             <i data-lucide="plus" class="text-white size-4"></i>
                         </button>
                     </form>

@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -188,8 +191,8 @@ def ProductPage(request,pdid):
 
     cartData = request.session.get("cart",{})
     # product_id = str(product.id)
-    displayQuantity = cartData.get(pdid, 0)
-    inCart = pdid in cartData
+    displayQuantity = cartData.get(str(pdid), 0)
+    inCart = str(pdid) in cartData
     
 
     reviews = generate_dummy_reviews(product)
@@ -213,11 +216,10 @@ def SearchResults(request):
 
     search = request.GET.get('search','')
 
-    products = dummyProducts()
-    resultProducts = []
-    for product in products:
-        if search in product['name'].lower():
-            resultProducts.append(product)
+    resultProducts = Product.objects.filter(
+        Q(name__icontains=search) |
+        Q(description__icontains=search)
+    )
 
     context = {
         'search':search,
@@ -227,10 +229,12 @@ def SearchResults(request):
     return render(request, "SearchResults.html", context=context)
 
 def FlashDeals(request):
+    cartData = cart(request)
     
-    products = Product.objects.filter(stock__gt= 0 , discount__gt=0).order_by('-discount')[:10]
+    products = Product.objects.filter( stock__gt= 0, discount__gt=0).order_by('-discount')[:10]
 
     context={
+        'cart':cartData,
         'products':products,
     }
     return render(request, "FlashDeals.html", context=context)
@@ -285,7 +289,8 @@ def Checkout(request):
     deliveryFee = 0
     if cartData['cart_total'] <= 20:
         deliveryFee = 1.99
-    tax = cartData['cart_total'] * 0.08
+    tax = cartData['cart_total'] * Decimal(0.08)
+    tax = round(tax, 2)
     total = cartData['cart_total'] + deliveryFee + tax
 
     step = request.GET.get("step", "address")
