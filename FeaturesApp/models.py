@@ -1,13 +1,17 @@
+from decimal import Decimal
+
 from django.db import models
 from accounts.models import Address
 from django.conf import settings
-# Create your models here.
+from django.core.validators import MinValueValidator, MaxValueValidator
 
+# Create your models here.
 class Category(models.Model):
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to="categories/")
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -16,17 +20,41 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='ProductCategory')
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    original_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, validators=[
+        MinValueValidator(0),
+    ],)
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, validators=[
+        MinValueValidator(0),
+    ],)
     image = models.ImageField(upload_to="products/")
     unit = models.CharField(max_length=30, default='piece')
-    stock = models.IntegerField(default=0)
+    stock = models.PositiveIntegerField(default=0,validators=[
+        MinValueValidator(0),
+    ],)
     is_organic = models.BooleanField(default=False)
-    rating = models.FloatField(default=0)
-    review_count = models.IntegerField(default=0)
-    discount = models.IntegerField(default=0)
+    rating = models.FloatField(default=0,validators=[
+        MinValueValidator(0),
+        MaxValueValidator(5),
+    ],)
+    review_count = models.PositiveIntegerField(default=0,validators=[
+        MinValueValidator(0),
+    ])
+    discount = models.FloatField(default=0,validators=[
+        MinValueValidator(0),
+        MaxValueValidator(100),
+    ])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+
+        if self.original_price is not None:
+            discount_amount = (
+                self.original_price * Decimal(self.discount) / Decimal(100)
+            )
+            self.price = self.original_price - round(discount_amount, 2)
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

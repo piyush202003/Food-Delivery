@@ -220,8 +220,9 @@ def SearchResults(request):
 
 def FlashDeals(request):
     # filter for product.stock > 0
+    products = Product.objects.filter(stock__gt= 0 , discount__gt=0).order_by('-discount')[:10]
     context={
-        'products':dummyProducts(),
+        'products':products,
     }
     return render(request, "FlashDeals.html", context=context)
 
