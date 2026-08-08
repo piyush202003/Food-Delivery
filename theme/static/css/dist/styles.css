@@ -401,6 +401,9 @@
   .mt-2\.5 {
     margin-top: calc(var(--spacing) * 2.5);
   }
+  .mt-3 {
+    margin-top: calc(var(--spacing) * 3);
+  }
   .mt-4 {
     margin-top: calc(var(--spacing) * 4);
   }
@@ -2112,9 +2115,19 @@
       }
     }
   }
+  .focus\:border-green-400 {
+    &:focus {
+      border-color: var(--color-green-400);
+    }
+  }
   .focus\:border-green-500 {
     &:focus {
       border-color: var(--color-green-500);
+    }
+  }
+  .focus\:border-green-600 {
+    &:focus {
+      border-color: var(--color-green-600);
     }
   }
   .focus\:border-green-800 {

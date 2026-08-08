@@ -64,6 +64,7 @@ def register_view(request):
     return render(request, "accounts/login.html", context = context)
 
 def logout_view(request):
+    request.session.flush() # to remove all data stored in session
     logout(request)
     messages.warning(request, f'Your Account has been Logged Out')
     return redirect("Home")

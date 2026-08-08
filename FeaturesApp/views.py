@@ -1,16 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib import messages
+from requests import session
 
 from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors, dummyAddressData
-from .models import Product
+from .models import Category, Product
 
 # Create your views here.
 def Home(request):
+
+    categories = Category.objects.all().order_by('slug')
+
+    popularProducts = Product.objects.all().order_by('-rating')[:10]
+
     context = {
-        "cartCount":12,
-        "categoriesData" : dummyCategoriesData(),
-        "products" : dummyProducts(),
+        "categoriesData" : categories,
+        "products" : popularProducts,
         "cart" : cart(request)
     }
     return render(request, "Home.html", context=context)
@@ -109,54 +114,70 @@ def clear_cart(request):
 
 
 def Products(request):
-    category = request.GET.get("category", "")
-    organic = request.GET.get("organic", "")
-    sort = request.GET.get("sort", "")
-    min_price = request.GET.get("minPrice", "")
-    max_price = request.GET.get("maxPrice", "")
+    clear_all_filters = request.GET.get('clearAllFilters', 0)
 
-    products_data = dummyProducts()
-    categories = [{'slug':"", 'name':'All Categories'}] + dummyCategoriesData()
+    if (clear_all_filters):
+        request.session.pop('productsCategory', None)
+        request.session.pop('productsOrganic', None)
+        request.session.pop('productsSort', None)
+        request.session.pop('productsMin_price', None)
+        request.session.pop('productsMax_price', None)
 
-    let = []
+    category = request.GET.get("category", request.session.get('productsCategory',''))
+    organic = request.GET.get("organic", request.session.get('productsOrganic', ''))
+    sort = request.GET.get("sort", request.session.get('productsSort', ''))
+    min_price = request.GET.get("minPrice", request.session.get('productsMin_price', ''))
+    max_price = request.GET.get("maxPrice", request.session.get('productsMax_price', ''))
+
+    print(request.GET.get('minPrice'))
+
+    products_data = Product.objects.all()
+    categories = Category.objects.all()
+
     if category:
-        for item in products_data:
-            if item['category'] == category:
-                let.append(item)
-    else:
-        let = products_data
+        products_data = products_data.filter(category__slug = category)
+        request.session['productsCategory'] = category
+    
     if organic == 'true':
         products_data = products_data.filter(is_organic=True)
+        request.session['productsOrganic'] = organic
+
     if min_price:
         products_data = products_data.filter(price__gte=min_price)
+        request.session['productsMin_price'] = min_price 
+
     if max_price:
-        prodcuts_data = prodcuts_data.filter(price_lte=max_price)
+        products_data = products_data.filter(price__lte=max_price)
+        request.session['productsMax_price'] = max_price
 
-    if sort == "price_asc":
-        products_data = products_data.order_by('price')
-    elif sort == 'price_desc':
-        products_data = products_data.order_by("-price")
-    elif sort == 'rating':
-        products_data = products_data.order_by("-rating")
-    elif sort == "newest":
-        products_data = products_data.order_by("-created_at")
+    if sort:
+        request.session['productsSort']  = sort
+        if sort == "price_asc":
+            products_data = products_data.order_by('price')
+        elif sort == 'price_desc':
+            products_data = products_data.order_by("-price")
+        elif sort == 'rating':
+            products_data = products_data.order_by("-rating")
+        elif sort == "newest":
+            products_data = products_data.order_by("-created_at")
+        elif sort == 'name':
+            products_data = products_data.order_by('name')
 
-    paginator = Paginator(let, 12)
+    paginator = Paginator(products_data, 12)
 
     page_number = request.GET.get("page")
 
-    let = paginator.get_page(page_number)
+    products_data = paginator.get_page(page_number)
 
     context = {
         "cart" : cart(request),
-        # 'products': products_data,
-        'products': let,
+        'products': products_data,
         'category':category, 
         'categories':categories,
         'organic':organic,
         'sort':sort,
-        'min_price':min_price,
-        'max_price':max_price,
+        'minPrice':min_price,
+        'maxPrice':max_price,
     }
     return render(request, "Products.html", context=context)
 
@@ -219,8 +240,9 @@ def SearchResults(request):
     return render(request, "SearchResults.html", context=context)
 
 def FlashDeals(request):
-    # filter for product.stock > 0
+    
     products = Product.objects.filter(stock__gt= 0 , discount__gt=0).order_by('-discount')[:10]
+
     context={
         'products':products,
     }
