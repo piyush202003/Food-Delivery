@@ -6,7 +6,7 @@ class AdminProductForms(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields=['category', 'name', 'description', 'price', 'original_price', 'image', 'unit', 'stock', 'is_organic' ]
+        fields=['category', 'name', 'description', 'original_price', 'discount', 'image', 'unit', 'stock', 'is_organic' ]
 
         widgets = {
             "name": forms.TextInput(attrs={
@@ -18,16 +18,17 @@ class AdminProductForms(forms.ModelForm):
                 'empty_label':"Select a category"
             }),
 
-            "price": forms.NumberInput(attrs={
+            "original_price": forms.NumberInput(attrs={
                 "class": "w-full px-4 py-2.5 rounded-xl border border-zinc-300 focus:border-green-900 outline-none focus:ring-1 focus:ring-app-green transtion-all",
                 "step":'0.01',
                 'min':'0',
             }),
 
-            "original_price": forms.NumberInput(attrs={
+            "discount": forms.NumberInput(attrs={
                 "class": "w-full px-4 py-2.5 rounded-xl border border-zinc-300 focus:border-green-900 outline-none focus:ring-1 focus:ring-app-green transtion-all",
                 "step":'0.01',
                 'min':'0',
+                'max':'100',
             }),
 
             "unit": forms.TextInput(attrs={

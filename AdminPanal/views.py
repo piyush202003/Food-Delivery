@@ -5,7 +5,7 @@ from httpx import RequestError
 from AdminPanal.dummyData import dummy_admin_dashboard_data
 from DeliveryPartner.dummyData import dummy_delivery_partner_data
 from FeaturesApp.dummyData import dummyCategoriesData, dummyDashboardOrdersData, dummyProducts
-from FeaturesApp.models import Product
+from FeaturesApp.models import Category, DeliveryPartner, Product
 
 from .forms import AdminProductForms
 
@@ -43,17 +43,19 @@ def AdminDashboard(request):
     return render(request, 'admin/AdminDashboard.html', context=context)
 
 def AdminProducts(request):
-
-    products = dummyProducts()
-    productId = request.GET.get('productId','')
-    if productId:
-        messages.warning(request,f'Product #{productId[-6:].upper()} is set for stock out')
+    products = Product.objects.all()
 
     context={
         'AdminLinkData':AdminLinkData,
         'products':products,
     }
     return render(request, 'admin/AdminProducts.html', context=context)
+
+def AdminProductDelete(request, id):
+    product = get_object_or_404(Product, id=id)
+    messages.error(request, f'Product with Id #{product.id[-6:].upper()} has been Deleted!')
+    product.delete()
+    return redirect('AdminProducts')
 
 def AdminProductForm(request, id=None):
     product=None
@@ -62,7 +64,7 @@ def AdminProductForm(request, id=None):
         product = get_object_or_404(Product, id=id)
 
     if request.method == "POST":
-        form = AdminProductForms(request.POST, request.FILES, instance=Product,)
+        form = AdminProductForms(request.POST, request.FILES, instance=product,)
 
         if form.is_valid():
             form.save()
@@ -74,7 +76,7 @@ def AdminProductForm(request, id=None):
     context={
         'AdminLinkData':AdminLinkData,
         'isEdit':product is not None,
-        'categoriesData':dummyCategoriesData(),
+        'categoriesData':Category.objects.all(),
         'form':form,
         'product':product,
     }
@@ -119,7 +121,7 @@ def AdminOrders(request):
 
 def AdminDeliveryPartners(request):
 
-    partners = dummy_delivery_partner_data()
+    partners = DeliveryPartner.objects.all()
 
     context={
         'AdminLinkData':AdminLinkData,

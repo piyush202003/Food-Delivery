@@ -6,6 +6,8 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from requests import session
 
+from accounts.models import Address
+
 from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors, dummyAddressData
 from .models import Category, Product
 
@@ -450,8 +452,11 @@ def update_driver_location(request, odid):
     return JsonResponse({"status": "invalid_method"}, status=405)
 
 def Addresses(request):
+
+    addresses = Address.objects.all()
+
     context = {
-        'addresses': dummyAddressData(),
+        'addresses': addresses,
     }
     return render(request, "Addresses.html", context=context)
 

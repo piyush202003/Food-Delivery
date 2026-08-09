@@ -20,29 +20,15 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='ProductCategory')
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, validators=[
-        MinValueValidator(0),
-    ],)
-    original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, validators=[
-        MinValueValidator(0),
-    ],)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True)
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     image = models.ImageField(upload_to="products/")
     unit = models.CharField(max_length=30, default='piece')
-    stock = models.PositiveIntegerField(default=0,validators=[
-        MinValueValidator(0),
-    ],)
+    stock = models.PositiveIntegerField(default=0)
     is_organic = models.BooleanField(default=False)
-    rating = models.FloatField(default=0,validators=[
-        MinValueValidator(0),
-        MaxValueValidator(5),
-    ],)
-    review_count = models.PositiveIntegerField(default=0,validators=[
-        MinValueValidator(0),
-    ])
-    discount = models.FloatField(default=0,validators=[
-        MinValueValidator(0),
-        MaxValueValidator(100),
-    ])
+    rating = models.FloatField(default=0)
+    review_count = models.PositiveIntegerField(default=0)
+    discount = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
