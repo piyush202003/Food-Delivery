@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from requests import session
 
+from FeaturesApp.forms import AddressForm
 from accounts.models import Address
 
 from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors, dummyAddressData
@@ -451,12 +452,35 @@ def update_driver_location(request, odid):
 
     return JsonResponse({"status": "invalid_method"}, status=405)
 
-def Addresses(request):
+def Addresses(request, id=None):
 
-    addresses = Address.objects.all()
+    addresses = Address.objects.filter(user=request.user).order_by('-is_default', '-updated_at')
+
+    address = None
+    if id:
+        address = get_object_or_404(Address, id=id, user=request.user)
+
+    if request.method == "POST":
+        form = AddressForm(request.POST, instance=address)
+
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            address.save()
+
+            if id:
+                messages.success(request, f'Address with label {address.label} has been Updated Successfully')
+            else:
+                messages.success(request, 'New Address has been Added Successfully')
+            return redirect('Addresses')
+    else:
+        form = AddressForm(instance=address)
 
     context = {
         'addresses': addresses,
+        'form' : form,
+        'isEdit':address is not None,
+        'address':address,
     }
     return render(request, "Addresses.html", context=context)
 

@@ -10,7 +10,7 @@
             <div class="flex items-center gap-2 mb-1">
                 <p class="text0sm font-semibold text-green-900">{{ address.label }}</p>
                 
-                {% if address.isDefault %}
+                {% if address.is_default %}
                     <span class="flex items-center justify-center gap-1 px-3.5 py-0.5 text-[10px] font-medium bg-green-900 text-white rounded-full">
                         <i data-lucide="check" class="size-2.5"></i>
                         Default
@@ -28,11 +28,13 @@
 
     <!-- Right - action button -->
     <div class="flex items-center gap-1">
-        <button class="p-2 text-zinc-400 hover:text-green-900 hover:bg-amber-200 rounded-lg transition-colors">
-            <i data-lucide="pencil" class="size-4"></i>
-        </button>
+        <a href="{% url 'AddressEdit' address.id %}" class="address-form-edit-btn">
+            <button class="p-2 text-zinc-400 hover:text-green-900 hover:bg-amber-200 rounded-lg transition-colors cursor-pointer">
+                <i data-lucide="pencil" class="size-4"></i>
+            </button>
+        </a>
         <a href="{% url 'AddressDelete' address.id %}">
-            <button class="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+            <button class="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer">
                 <i data-lucide="trash-2" class="size-4"></i>
             </button>
         </a>
