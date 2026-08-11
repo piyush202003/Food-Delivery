@@ -2,10 +2,12 @@ from django.contrib import messages
 from django.shortcuts import render,redirect, get_object_or_404
 from httpx import RequestError
 
+from AdminPanal.decorators import admin_required
 from AdminPanal.dummyData import dummy_admin_dashboard_data
 from DeliveryPartner.dummyData import dummy_delivery_partner_data
 from FeaturesApp.dummyData import dummyCategoriesData, dummyDashboardOrdersData, dummyProducts
 from FeaturesApp.models import Category, DeliveryPartner, Product
+from accounts import admin
 
 from .forms import AdminProductForms
 
@@ -20,6 +22,7 @@ AdminLinkData = [
     { 'to': "AdminLogout", 'label': "Exit", 'icon': 'log-out' },
 ]
 
+@admin_required
 def AdminLogout(request):
     return redirect('Login')
 
@@ -42,6 +45,7 @@ def AdminDashboard(request):
     }
     return render(request, 'admin/AdminDashboard.html', context=context)
 
+@admin_required
 def AdminProducts(request):
     products = Product.objects.all()
 
@@ -51,12 +55,14 @@ def AdminProducts(request):
     }
     return render(request, 'admin/AdminProducts.html', context=context)
 
+@admin_required
 def AdminProductDelete(request, id):
     product = get_object_or_404(Product, id=id)
     messages.error(request, f'Product with Id #{product.id[-6:].upper()} has been Deleted!')
     product.delete()
     return redirect('AdminProducts')
 
+@admin_required
 def AdminProductForm(request, id=None):
     product=None
 
@@ -82,6 +88,7 @@ def AdminProductForm(request, id=None):
     }
     return render(request, 'admin/AdminProductForm.html', context=context)
 
+@admin_required
 def AdminOrders(request):
     orders = dummyDashboardOrdersData()
     partners = dummy_delivery_partner_data()
@@ -119,6 +126,7 @@ def AdminOrders(request):
     }
     return render(request, 'admin/AdminOrders.html', context=context)
 
+@admin_required
 def AdminDeliveryPartners(request):
 
     partners = DeliveryPartner.objects.all()

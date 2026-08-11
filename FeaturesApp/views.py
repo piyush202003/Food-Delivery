@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.contrib import messages
-from requests import session
+from django.contrib.auth.decorators import login_required
 
 from FeaturesApp.forms import AddressForm
 from accounts.models import Address
@@ -299,6 +299,7 @@ def FlashDeals(request):
     return render(request, "FlashDeals.html", context=context)
 
 # from here all are needed authentication verification
+@login_required(login_url='Login')
 def Checkout(request):
     cartData = cart(request)
 
@@ -366,6 +367,7 @@ def Checkout(request):
     }
     return render(request, "Checkout.html", context=context)
 
+@login_required(login_url='Login')
 def MyOrders(request):
 
     activeTab = request.GET.get('activeTab','All Orders')
@@ -386,6 +388,7 @@ def MyOrders(request):
     }
     return render(request, "MyOrders.html", context=context)
 
+@login_required(login_url='Login')
 def OrderTracking(request, odid):
     order = {}
     allStatus = ['Placed', 'Confirmed', 'Assigned', 'Packed', 'Out for Delivery', 'Delivered']
@@ -471,6 +474,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
 
+@login_required(login_url='Login')
 @csrf_exempt  # Remove @csrf_exempt if passing CSRF header/token from app
 def update_driver_location(request, odid):
     """
@@ -501,6 +505,7 @@ def update_driver_location(request, odid):
 
     return JsonResponse({"status": "invalid_method"}, status=405)
 
+@login_required(login_url='Login')
 def Addresses(request, id=None):
 
     addresses = Address.objects.filter(user=request.user).order_by('-is_default', '-updated_at')
@@ -533,6 +538,7 @@ def Addresses(request, id=None):
     }
     return render(request, "Addresses.html", context=context)
 
+@login_required(login_url='Login')
 def AddressDelete(request, addid):
     addresses = dummyAddressData()
 

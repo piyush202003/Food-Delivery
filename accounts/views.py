@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
 from config.settings import ADMIN_MAILS
@@ -63,6 +64,7 @@ def register_view(request):
     }
     return render(request, "accounts/login.html", context = context)
 
+@login_required(login_url='Login')
 def logout_view(request):
     request.session.flush() # to remove all data stored in session
     logout(request)
