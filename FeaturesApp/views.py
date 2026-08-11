@@ -10,7 +10,7 @@ from FeaturesApp.forms import AddressForm
 from accounts.models import Address
 
 from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors, dummyAddressData
-from .models import Category, Product
+from .models import Category, Order, OrderItem, OrderStatus, Product
 
 # Create your views here.
 def Home(request):
@@ -33,10 +33,6 @@ def cart(request):
     cart_count = 0
     for product_id, quantity in cart.items():
         product = get_object_or_404(Product, id=product_id)
-        # for item in dummyProducts():
-        #     if item["id"] == product_id:
-        #         product = item
-        # total_price = product.price * quantity
         if product:
             total_price = product.price * quantity
             cart_items.append({
@@ -51,12 +47,17 @@ def cart(request):
     if cart_total <= 20:
         delivery_fee = 1.99
 
+    tax = cart_total * Decimal(0.08)
+    tax = round(tax, 2)
+
     context = {
         "cart_items":cart_items,
         "cart_total":cart_total,
         "cart_count":cart_count,
         "grand_total": cart_total + delivery_fee,
         "delivery_fee":delivery_fee,
+        'tax':tax,
+        'last_total': cart_total + delivery_fee + tax,
     }
 
     return context
@@ -246,55 +247,24 @@ def FlashDeals(request):
 def Checkout(request):
     cartData = cart(request)
 
-    user = {
-        'addresses':dummyAddressData(),
-    }
-    address = {
-        'id':'',
-        'label':'Home',
-        'address':'',
-        'city':'',
-        'state':'',
-        'zip':'',
-        'isDefault':False,
-        'lat':0,
-        'lng':0
-    }
-
+    addresses = Address.objects.filter(user=request.user)
+    address = None
     newAdd = request.GET.get('addrId','')
     prevAdd = request.session.get('addrId','')
-    for add in user['addresses']:
-        if newAdd:
-            if add['id'] == newAdd:
-                address = add
-                request.session['addrId'] = add['id']
-                break
-        elif prevAdd:
-            if add['id'] == prevAdd:
-                address = add
-                request.session['addrId'] = add['id']
-                break
-        else:
-            if add['isDefault']:
-                address = add
-                request.session['addrId'] = add['id']
-                break
-    address = request.GET.get('address', address)
+    if newAdd:
+        address = addresses.filter(id=int(newAdd)).first()
+        request.session['addrId'] = address.id
+    elif prevAdd:
+        address = addresses.filter(id=int(prevAdd)).first()
+    else:
+        address = addresses.filter(is_default=True).first()
+        request.session['addrId'] = address.id
 
     paymentMethod = request.session.get("paymentMethod", "cash")
-
     if request.method == "POST":
         paymentMethod = request.POST.get("payment_method")
-
         request.session["paymentMethod"] = paymentMethod
 
-
-    deliveryFee = 0
-    if cartData['cart_total'] <= 20:
-        deliveryFee = 1.99
-    tax = cartData['cart_total'] * Decimal(0.08)
-    tax = round(tax, 2)
-    total = cartData['cart_total'] + deliveryFee + tax
 
     step = request.GET.get("step", "address")
     steps = [
@@ -302,16 +272,40 @@ def Checkout(request):
         {'key':'payment', 'label':'Payment', 'icon':'credit-card'},
         {'key':'review', 'label':'Review', 'icon':'check'},
     ]
-    
+
+    if request.GET.get('placeOrder'):
+        order = Order.objects.create(
+            user=request.user,
+            shipping_address=address,
+            payment_method=paymentMethod,
+            subtotal=cartData['cart_total'],
+            delivery_fee=cartData['delivery_fee'],
+            tax=cartData['tax'],
+            total=cartData['last_total'],
+            status='Placed',
+        )
+
+        for item in cartData['cart_items']:
+            OrderItem.objects.create(
+                order=order,
+                product=item['product'],
+                quantity=item['quantity'],
+                price=item['total'],
+            )
+
+        OrderStatus.objects.create(
+            order=order,
+            status='Placed',
+            note='Order Placed Successfully',
+        )
+
+        return redirect('Home')
 
     context = {
         "cart":cartData,
-        'user':user,
+        'addresses':addresses,
         'address':address,
         'paymentMethod':paymentMethod,
-        'deliveryFee':deliveryFee,
-        'tax':tax,
-        'total':total,
         'step':step,
         'steps':steps,
     }

@@ -1,16 +1,16 @@
 <section>
-    <div class="bg-white rounded-2xl p-6 animate-fade-in">
+    <div class="bg-white rounded-2xl p-6 animate-fade-in min-h-86 flex flex-col">
         <h2 class="text-lg font-semibold text-green-900 mb-5 flex items-center gap-2">
             <i data-lucide="map-pin" class="size-5"></i>
             Delivery Address
         </h2>
         
-        {% if user.addresses and user.addresses|length > 0 %}
+        {% if addresses and addresses|length > 0 %}
             <div class="mb-6">
                 <h3 class="text-sm font-semibold text-green-900 mb-3">Saved Addresses</h3>
                 <div class="grid sm:grid-cols-2 gap-3">
                     
-                    {% for addr in user.addresses %}
+                    {% for addr in addresses %}
                         <a href="{% url 'Checkout' %}?addrId={{ addr.id }}">
                             <div class="p-4 rounded-xl border cursor-pointer transition-colors
                             {% if address.label == addr.label and address.address == addr.address %}
@@ -22,12 +22,12 @@
                                 <div class="flex items-center gap-2 mb-1">
                                     <i data-lucide="map-pin" class="size-4 text-green-900"></i>
                                     <span class="font-semibold text-zinc-900 text-sm">{{ addr.label }}</span>
-                                    {% if addr.isDefault %}
+                                    {% if addr.is_default %}
                                         <span class="text-[10px] font-semibold text-orange-400 uppercase tracking-wider bg-orange-50 px-2 py-0.5 rounded-full">Default</span>
                                     {% endif %}
                                 </div>
                                 <p class="text-sm text-zinc-600 truncate">{{ addr.address }}</p>  
-                                <p class="text-xs text-zinc-500">{{ addr.city }}, {{ addr.state }} {{ addr.zip }}</p>
+                                <p class="text-xs text-zinc-500">{{ addr.city }}, {{ addr.state }} -- {{ addr.zip }}</p>
                             </div>
                         </a>
                     {% endfor %}
@@ -46,6 +46,17 @@
                         </button>
                     </a>
                 </div>
+            </div>
+        {% else %}
+            <div class="flex flex-col items-center justify-center h-full text-center text-gray-400 space-x-4">
+                <i data-lucide="map-pin" class="size-12"></i>
+                There are No Addresses registered 
+            </div>
+            <div class="p-5">
+                <a href="{% url 'Addresses' %}" class="mt-6 px-6 py-3 border border-white text-white bg-green-900 hover:bg-green-600 rounded-xl flex items-center justify-center gap-2 cursor-pointer">
+                    Add New Address
+                    <i data-lucide="plus" class="size-4"></i>
+                </a>
             </div>
         {% endif %}
             

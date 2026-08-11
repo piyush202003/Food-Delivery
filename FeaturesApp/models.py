@@ -46,8 +46,8 @@ class Product(models.Model):
         return self.name
 
 class CartItem(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="CartUser")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="CartProduct")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="cart_items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="cart_items")
     quantity = models.PositiveIntegerField(default=1)
 
 class DeliveryPartner(models.Model):
@@ -84,15 +84,15 @@ class Order(models.Model):
         ("cash", "Cash"),
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="OrderUser")
-    shipping_address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name="OrderAddress")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="order")
+    shipping_address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name="order")
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default='card')
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Placed')
-    delivery_partenr = models.ForeignKey(DeliveryPartner, on_delete=models.SET_NULL, null=True, blank=True, related_name="OrderDeliveryPartner")
+    delivery_partenr = models.ForeignKey(DeliveryPartner, on_delete=models.SET_NULL, null=True, blank=True, related_name="order")
     delivery_otp = models.CharField(max_length=6, blank=True, default='')
     live_location = models.JSONField(blank=True, null=True)
     is_paid = models.BooleanField(default=False)
