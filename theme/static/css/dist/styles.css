@@ -384,9 +384,6 @@
   .m-2 {
     margin: calc(var(--spacing) * 2);
   }
-  .m-4 {
-    margin: calc(var(--spacing) * 4);
-  }
   .mx-auto {
     margin-inline: auto;
   }
@@ -617,14 +614,8 @@
   .w-56 {
     width: calc(var(--spacing) * 56);
   }
-  .w-64 {
-    width: calc(var(--spacing) * 64);
-  }
   .w-74 {
     width: calc(var(--spacing) * 74);
-  }
-  .w-80 {
-    width: calc(var(--spacing) * 80);
   }
   .w-\[calc\(100\%-2rem\)\] {
     width: calc(100% - 2rem);
@@ -1829,13 +1820,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-amber-200);
-      }
-    }
-  }
-  .hover\:bg-amber-400 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-amber-400);
       }
     }
   }
