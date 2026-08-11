@@ -32,16 +32,19 @@
                         <span class="text-xs text-zinc-400 block">/{{ product.unit }}</span>
                         
                         {% if product.original_price > product.price %}
-                            <span class="text-xs text-zinc-400 line-through ml-1.5">${{ product.original_price }}</span>
+                            <span class="text-xs text-zinc-400 line-through ml-1.5 self-end">${{ product.original_price }}</span>
                         {% endif %}
                             
                     </div>
                     <form action="{% url 'AddToCart' product.id %}" method="POST">
                         {% csrf_token %}
-
-                        <button type="submit" class="size-7 rounded-full bg-orange-300 text-white flex items-center justify-center hover:bg-orange-600 transition-colors active:scale-95">
-                            <i data-lucide="plus" class="text-white size-4"></i>
-                        </button>
+                        {% if product.stock > 0 %}
+                            <button type="submit" class="size-7 rounded-full bg-orange-700 text-white flex items-center justify-center hover:bg-orange-500 transition-colors active:scale-95">
+                                <i data-lucide="plus" class="text-white size-4"></i>
+                            </button>
+                        {% else %}
+                            <!-- <span class="text-red-600 font-semibold text-xs whitespace-nowrap">Out of Stock</span> -->
+                        {% endif %}
                     </form>
                 </div>
             </div>

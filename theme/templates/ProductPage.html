@@ -133,7 +133,7 @@
 
                             </div>
                         {% else %}
-                            <a href="{% url 'AddToCart' product.id %}" class="">
+                            <a href="{% url 'AddToCart' product.id %}" class="" {% if product.stock <= 0 %}disabled{% endif %}>
                                 <button class="w-full py-3 font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] bg-orange-400 text-white hover:bg-orange-600">
                                     <i data-lucide="shopping-cart" class="w-4 h-4"></i>
                                     Add To Cart 

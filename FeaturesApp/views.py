@@ -10,7 +10,7 @@ from FeaturesApp.forms import AddressForm
 from accounts.models import Address
 
 from .dummyData import dummyProducts, dummyCategoriesData, generate_dummy_reviews, get_rating_breakdown, dummyDashboardOrdersData, statusColors, dummyAddressData
-from .models import Category, Order, OrderItem, OrderStatus, Product
+from .models import CartItem, Category, Order, OrderItem, OrderStatus, Product
 
 # Create your views here.
 def Home(request):
@@ -27,25 +27,39 @@ def Home(request):
     return render(request, "Home.html", context=context)
 
 def cart(request):
-    cart = request.session.get("cart", {})
+    
     cart_items = []
-    cart_total = 0
+    cart_total = Decimal('0')
     cart_count = 0
-    for product_id, quantity in cart.items():
-        product = get_object_or_404(Product, id=product_id)
-        if product:
-            total_price = product.price * quantity
+
+    if request.user.is_authenticated:
+        items = CartItem.objects.filter(user=request.user)
+        for item in items:
+            total_price = item.product.price * item.quantity
             cart_items.append({
-                "product":product,
-                "quantity":quantity,
-                "total":total_price,
+                'product':item.product,
+                'quantity':item.quantity,
+                'total':total_price,
             })
             cart_total += total_price
             cart_count += 1
+    else:
+        cart = request.session.get("cart", {})
+        for product_id, quantity in cart.items():
+            product = get_object_or_404(Product, id=product_id)
+            if product:
+                total_price = product.price * quantity
+                cart_items.append({
+                    "product":product,
+                    "quantity":quantity,
+                    "total":total_price,
+                })
+                cart_total += total_price
+                cart_count += 1
     
-    delivery_fee = 0
-    if cart_total <= 20:
-        delivery_fee = 1.99
+    delivery_fee = Decimal('0')
+    if cart_total <= Decimal('20'):
+        delivery_fee = Decimal(1.99)
 
     tax = cart_total * Decimal(0.08)
     tax = round(tax, 2)
@@ -64,27 +78,45 @@ def cart(request):
 
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    cart = request.session.get("cart",{})
+    if product.stock <= 0:
+        messages.error(request, "This product is out of stock.")
+        return redirect(request.META.get("HTTP_REFERER", "Home"))
     
-    product_id = str(product_id)
-    
-    if product_id in cart:
-        cart[product_id] += 1
+    if request.user.is_authenticated:
+        item = CartItem.objects.filter(user=request.user, product=product).first()
+        if item:
+            item.quantity += 1
+            item.save()
+        else:
+            CartItem.objects.create(
+                user=request.user,
+                product=product,
+                quantity=1,
+            )
     else:
-        cart[product_id] = 1
-    request.session['cart'] = cart
+        cart = request.session.get("cart",{})
+        product_id = str(product_id)
+        if product_id in cart:
+            cart[product_id] += 1
+        else:
+            cart[product_id] = 1
+        request.session['cart'] = cart
+
+    messages.success(request, 'Product Added in Cart')
     return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 def remove_from_cart(request, product_id):
-    cart = request.session.get('cart',{})
 
-    product_id = str(product_id)
-
-    if product_id in cart:
-        del cart[product_id]
-
-    request.session['cart'] = cart
-
+    if request.user.is_authenticated:
+        item = get_object_or_404(CartItem, user=request.user, product__id=product_id)
+        item.delete()
+    else:
+        cart = request.session.get('cart',{})
+        product_id = str(product_id)
+        if product_id in cart:
+            del cart[product_id]
+        request.session['cart'] = cart
+    messages.warning(request, 'Item has been removed from Cart')
     return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 def update_cart(request, product_id):
@@ -92,28 +124,51 @@ def update_cart(request, product_id):
     if request.method == "POST":
 
         action = request.POST.get("action")
+        if action not in ['increase', 'decrease']:
+            messages.error(request, 'Invalid cart action.')
+            return redirect(request.META.get('HTTP_REFERER','Home'))
 
-        cart = request.session.get("cart", {})
+        if request.user.is_authenticated:
+            item = get_object_or_404(CartItem, user=request.user, product__id=product_id)
+            if action == 'increase':
+                if item.quantity >= item.product.stock:
+                    messages.warning(request, 'You cannot add more than the availabel stock!')
+                    return redirect(request.META.get('HTTP_REFERER', 'Home'))
+                item.quantity+=1
+                item.save()
+            elif action == 'decrease':
+                item.quantity -= 1
+                if item.quantity == 0:
+                    item.delete()
+                else:
+                    item.save()
+        else:
+            cart = request.session.get("cart", {})
+            product_id = str(product_id)
+            if product_id in cart:
+                if action == "increase":
+                    product = get_object_or_404(Product, id=product_id)
+                    if cart[product_id] >= product.stock:
+                        messages.warning(request, 'You cannot add more than the available stock.')
+                        return redirect(request.META.get('HTTP_REFERER','Home'))
+                    cart[product_id] += 1
+                elif action == "decrease":
+                    cart[product_id] -= 1
+                    if cart[product_id] <= 0:
+                        del cart[product_id]
+            request.session["cart"] = cart
 
-        product_id = str(product_id)
-
-        if product_id in cart:
-
-            if action == "increase":
-                cart[product_id] += 1
-
-            elif action == "decrease":
-                cart[product_id] -= 1
-
-                if cart[product_id] <= 0:
-                    del cart[product_id]
-        
-        request.session["cart"] = cart
+    messages.success(request, 'Item quantity has benn Updated')
 
     return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 def clear_cart(request):
-    request.session['cart'] = {}
+    if request.user.is_authenticated:
+        items = CartItem.objects.filter(user=request.user)
+        items.delete()
+    else:
+        request.session.pop('cart', None)
+    messages.warning(request, 'All Cart Items has been Cleared!')
     return redirect(request.META.get("HTTP_REFERER", "Home"))
 
 
