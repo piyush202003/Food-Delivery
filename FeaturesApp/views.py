@@ -540,13 +540,7 @@ def Addresses(request, id=None):
 
 @login_required(login_url='Login')
 def AddressDelete(request, addid):
-    addresses = dummyAddressData()
-
-    # Address.objects.filter(id=addid).delete()
-    for address in addresses:
-        if address['id'] == addid:
-            del address['id']
-            break
-    print(addresses)
-    
+    address = get_object_or_404(Address, user=request.user, id=addid)
+    address.delete()
+    messages.warning(request, 'Address has been Deleted')
     return redirect(request.META.get("HTTP_REFERER", "Addresses"))
