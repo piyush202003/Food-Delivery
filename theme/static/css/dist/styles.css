@@ -484,6 +484,9 @@
   .hidden {
     display: none;
   }
+  .inline-block {
+    display: inline-block;
+  }
   .inline-flex {
     display: inline-flex;
   }
@@ -644,6 +647,9 @@
   }
   .max-w-60 {
     max-width: calc(var(--spacing) * 60);
+  }
+  .max-w-\[150px\] {
+    max-width: 150px;
   }
   .max-w-\[200px\] {
     max-width: 200px;
@@ -1101,12 +1107,6 @@
   .bg-orange-700 {
     background-color: var(--color-orange-700);
   }
-  .bg-orange-700\/10 {
-    background-color: color-mix(in srgb, oklch(55.3% 0.195 38.402) 10%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-orange-700) 10%, transparent);
-    }
-  }
   .bg-purple-100 {
     background-color: var(--color-purple-100);
   }
@@ -1218,9 +1218,6 @@
   }
   .p-1 {
     padding: calc(var(--spacing) * 1);
-  }
-  .p-1\.5 {
-    padding: calc(var(--spacing) * 1.5);
   }
   .p-2 {
     padding: calc(var(--spacing) * 2);
@@ -1432,6 +1429,10 @@
   .text-\[22px\] {
     font-size: 22px;
   }
+  .leading-4 {
+    --tw-leading: calc(var(--spacing) * 4);
+    line-height: calc(var(--spacing) * 4);
+  }
   .leading-relaxed {
     --tw-leading: var(--leading-relaxed);
     line-height: var(--leading-relaxed);
@@ -1529,9 +1530,6 @@
   }
   .text-orange-600 {
     color: var(--color-orange-600);
-  }
-  .text-orange-700 {
-    color: var(--color-orange-700);
   }
   .text-purple-700 {
     color: var(--color-purple-700);

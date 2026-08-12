@@ -1,4 +1,5 @@
 from decimal import Decimal
+import secrets
 
 from django.db import models
 from accounts.models import Address
@@ -56,11 +57,12 @@ class DeliveryPartner(models.Model):
         ("scooter", "Scooter"),
         ("car", "Car"),
     ]
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=15)
-    password = models.CharField(max_length=128)
-    avatar = models.ImageField(upload_to="deliveryPartner/", blank=True, null=True)
+    # name = models.CharField(max_length=100)
+    # email = models.EmailField(unique=True)
+    # phone = models.CharField(max_length=15)
+    # password = models.CharField(max_length=128)
+    # avatar = models.ImageField(upload_to="deliveryPartner/", blank=True, null=True)
+    user = models.ForeignKey( settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="delivery_partner")
     vehicle_type = models.CharField(max_length=20, choices=VEHICLE_TYPES, default='bike')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -73,6 +75,7 @@ class Order(models.Model):
     STATUS_CHOICES = (
         ("Placed", "Placed"),
         ("Confirmed", "Confirmed"),
+        ('Assigned', 'Assigned'),
         ("Packed", "Packed"),
         ("Out for Delivery", "Out for Delivery"),
         ("Delivered", "Delivered"),
@@ -99,6 +102,15 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if self.status == 'Out for Delivery':
+            otp = secrets.randbelow(900000) +100000
+            self.delivery_otp = str(otp)
+        elif self.status not in ['Out for Delivery', 'Delivered']:
+            self.delivery_otp = ''
+
+        super().save(*args, **kwargs)
+              
     def __str__(self):
         return str(self.id)
 
@@ -111,5 +123,5 @@ class OrderItem(models.Model):
 class OrderStatus(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="history")
     status = models.CharField(max_length=30)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    note = models.TextField(blank=True)
+    timestamp = models.DateTimeField(auto_now=True)
+    note = models.TextField(blank=True, null=True)

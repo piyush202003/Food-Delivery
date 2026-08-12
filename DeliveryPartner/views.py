@@ -1,21 +1,39 @@
-from os import O_TEMPORARY
-
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import logout, login
 
 from FeaturesApp.dummyData import dummyDashboardOrdersData, statusColors
+from FeaturesApp.models import DeliveryPartner
 from .dummyData import dummy_delivery_partner_data
 
 # Create your views here.
 def DeliveryLogin(request):
+    if request.method == 'POST':
+        email = request.POST.get('email', '')
+        password = request.POST.get('password', '')
+
+        user = DeliveryPartner.objects.filter(email=email).first()
+        if user is None:
+            messages.error(request, 'Entered Email is not Registered..')
+            return redirect('DeliveryPartnerLogin')
+        if user.password != password:
+            messages.error(request, 'Entered Password is wrong.')
+            return redirect('DeliveryPartnerLogin')
+
+        login(user)
+        messages.success(request, 'User has been Logged In')
+        return redirect('DeliveryDashboard')    
+
     context={
 
     }
     return render(request, 'delivery/DeliveryLogin.html', context=context)
 
 def DeliveryLogout(request):
-
+    logout(request.user)
+    messages.warning(request, 'Your has been Logged Out!')
     return render(request, 'delivery/DeliveryLogin.html')
+
 
 def DeliveryDashboard(request):
     orders = dummyDashboardOrdersData()
@@ -47,7 +65,7 @@ def DeliveryDashboard(request):
     else:
         otpModel = request.session.get('deliveryPartnerOtpModal')
     
-    print(f'otpModal = {otpModal}')
+    # print(f'otpModal = {otpModal}')
     otp = ''
 
     submitting = False

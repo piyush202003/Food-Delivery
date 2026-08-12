@@ -376,7 +376,7 @@ def MyOrders(request):
     if activeTab == 'All Orders':
         orders = Order.objects.filter(user=request.user)
     elif activeTab == 'Placed':
-        orders = Order.objects.filter(user=request.user, status__in=[ 'Placed', 'Confirmed', 'Packed'])
+        orders = Order.objects.filter(user=request.user, status__in=[ 'Placed', 'Confirmed', 'Assigned', 'Packed'])
     else:
         orders = Order.objects.filter(user=request.user, status=activeTab)
 

@@ -7,7 +7,7 @@ from AdminPanal.decorators import admin_required
 from AdminPanal.dummyData import dummy_admin_dashboard_data
 from DeliveryPartner.dummyData import dummy_delivery_partner_data
 from FeaturesApp.dummyData import dummyCategoriesData, dummyDashboardOrdersData, dummyProducts
-from FeaturesApp.models import Category, DeliveryPartner, Order, Product
+from FeaturesApp.models import Category, DeliveryPartner, Order, OrderStatus, Product
 from accounts import admin
 from accounts.models import User
 
@@ -100,18 +100,39 @@ def AdminProductForm(request, id=None):
 
 @admin_required
 def AdminOrders(request):
-    orders = dummyDashboardOrdersData()
-    partners = dummy_delivery_partner_data()
+    orders = Order.objects.all().order_by('-created_at')
+    partners = DeliveryPartner.objects.filter(is_active=True).order_by('name')
     statusOptions = ["Placed", "Confirmed", "Assigned", "Packed", "Out for Delivery", "Delivered", "Cancelled"]
 
     selectedPartner = ''
     if request.method == 'POST':
         if 'assignPartner' in request.POST:
             selectedPartner = request.POST.get('partner')
-    
-        if selectedPartner:
-            assignModal = request.session.get('assignModal')
-            messages.success(request, f"Order #{assignModal[-6:].upper()} has been assigned to #{selectedPartner[-6:].upper()} successfully.")
+            order_id = request.POST.get('order_id')
+            if selectedPartner:
+                order = get_object_or_404(Order, id=order_id)
+                partner = get_object_or_404(DeliveryPartner, id=selectedPartner)
+                order.delivery_partner = partner
+                order.status = 'Assigned'
+                OrderStatus.objects.create(
+                    order=order,
+                    status='Assigned',
+                )
+                order.save()
+                messages.success(request, f'For order #{order.id} delivery partner {partner.name} is assigned.')
+        elif 'status_change' in request.POST:
+            status = request.POST.get('status_change')
+            order_id = request.POST.get('order_id')
+            if status:
+                order = get_object_or_404(Order, id=order_id)
+                if order.status != status:
+                    order.status = status
+                    order.save()
+                    OrderStatus.objects.create(
+                        order=order,
+                        status=status,
+                    )
+                messages.success(request, f'Updated status of order #{order_id} is {status}')
 
     assignModal = request.GET.get('assignModal')
     if assignModal :
