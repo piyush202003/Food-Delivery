@@ -1,13 +1,15 @@
 from django.contrib import messages
+from django.contrib.auth import login, logout
 from django.shortcuts import render,redirect, get_object_or_404
-from httpx import RequestError
+
 
 from AdminPanal.decorators import admin_required
 from AdminPanal.dummyData import dummy_admin_dashboard_data
 from DeliveryPartner.dummyData import dummy_delivery_partner_data
 from FeaturesApp.dummyData import dummyCategoriesData, dummyDashboardOrdersData, dummyProducts
-from FeaturesApp.models import Category, DeliveryPartner, Product
+from FeaturesApp.models import Category, DeliveryPartner, Order, Product
 from accounts import admin
+from accounts.models import User
 
 from .forms import AdminProductForms
 
@@ -24,12 +26,20 @@ AdminLinkData = [
 
 @admin_required
 def AdminLogout(request):
+    logout(request.user)
+    messages.warning(request, 'User has been Logged Out.')
     return redirect('Login')
 
 def AdminDashboard(request):
 
-    stats = dummy_admin_dashboard_data()
-    card = []
+    stats = {}
+    stats['totalOrders'] = Order.objects.count()
+    stats['totalUsers'] = User.objects.count()
+    stats['totalProducts'] = Product.objects.count()
+    stats['outOfStock'] = Product.objects.filter(stock__lte=0).count()
+    stats['totalPartners'] = DeliveryPartner.objects.count()
+    stats['recentOrders'] = Order.objects.all().order_by('-created_at')
+    
     if stats:
         cards = [
             { 'label': "Total Orders", 'value': stats['totalOrders'], 'icon': 'shopping-bag' },
