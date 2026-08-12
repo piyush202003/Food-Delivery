@@ -40,8 +40,8 @@
               .bindPopup('Delivery Partner');
           {% endif %}
 
-          {% if order.shippingAddress.lat and order.shippingAddress.lng %}
-            L.marker([{{ order.shippingAddress.lat }}, {{ order.shippingAddress.lng }}], { icon: destinationIcon })
+          {% if order.shipping_address.lat and order.shipping_address.lng %}
+            L.marker([{{ order.shipping_address.lat }}, {{ order.shipping_address.lng }}], { icon: destinationIcon })
               .addTo(map)
               .bindPopup('Delivery Address');
           {% endif %}

@@ -92,7 +92,7 @@ class Order(models.Model):
     tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='Placed')
-    delivery_partenr = models.ForeignKey(DeliveryPartner, on_delete=models.SET_NULL, null=True, blank=True, related_name="order")
+    delivery_partner = models.ForeignKey(DeliveryPartner, on_delete=models.SET_NULL, null=True, blank=True, related_name="order")
     delivery_otp = models.CharField(max_length=6, blank=True, default='')
     live_location = models.JSONField(blank=True, null=True)
     is_paid = models.BooleanField(default=False)

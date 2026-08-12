@@ -355,6 +355,8 @@ def Checkout(request):
             note='Order Placed Successfully',
         )
 
+        clear_cart(request)
+        messages.success(request, 'Your order has been placed')
         return redirect('Home')
 
     context = {
@@ -371,98 +373,73 @@ def Checkout(request):
 def MyOrders(request):
 
     activeTab = request.GET.get('activeTab','All Orders')
-    orders = dummyDashboardOrdersData()
+    if activeTab == 'All Orders':
+        orders = Order.objects.filter(user=request.user)
+    elif activeTab == 'Placed':
+        orders = Order.objects.filter(user=request.user, status__in=[ 'Placed', 'Confirmed', 'Packed'])
+    else:
+        orders = Order.objects.filter(user=request.user, status=activeTab)
+
     statusCol = statusColors()
-    # print(statusCol)
     for order in orders:
-        order['statusColour'] = statusCol[order['status']]
-        order['itemsExtraCount'] = len(order['items']) - 4
+        order.statusColour = statusCol.get(order.status, 'bg-gray-100 text-gray-700') # will raise error for unexpeted status
+        order.itemsExtraCount = max(order.items.count()-4, 0)
 
     context={
         'cart':cart(request),
-        'orders':orders,
-        'tabs':['All Orders', 'Placed', 'Out For Delivery', 'Delivered'],
+        'orders':orders.prefetch_related('items__product').order_by('-created_at'),
+        'tabs':['All Orders', 'Placed', 'Out For Delivery', 'Delivered', 'Cancelled'],
         'activeTab':activeTab,
-        'statusColours':statusColors(),
-
+        'statusColours':statusCol,
     }
     return render(request, "MyOrders.html", context=context)
 
 @login_required(login_url='Login')
 def OrderTracking(request, odid):
-    order = {}
     allStatus = ['Placed', 'Confirmed', 'Assigned', 'Packed', 'Out for Delivery', 'Delivered']
     statusCol = statusColors()
-    for od in dummyDashboardOrdersData():
-        if od['id'] == odid:
-            order = od
-            order['statusColour'] = statusCol[order['status']]
-            break
 
-    if not order:
-        messages.error(request, "There is no order with order id = ", odid)
-        return redirect(request.META.get("HTTP_REFERER", "MyOrders"))
+    order = get_object_or_404( Order, id=odid, user=request.user)
+    order.statusColour = statusCol.get(order.status, 'bg-gray-100 text-gray-700')
 
-    showOtp = order['deliveryOtp'] and order['status'] in allStatus[2:5]
+    currentIdx = (allStatus.index(order.status) if order.status in allStatus else -1)
+
+    showOtp = order.delivery_otp and order.status in allStatus[2:5]
 
     liveLocation = None
-    if order['status'] in allStatus[2:5]:
-        liveLocation = order['liveLocation']
+    if order.status in allStatus[2:5]:
+        liveLocation = order.live_location
 
-    statusIcons = {
-        "Placed": "clock",
-        "Confirmed": "check",
-        "Assigned": "truck",
-        "Packed": "package",
-        "Out for Delivery": "truck",
-        "Delivered": "check",
-    }
+    # Status information for timeline
     statusHistory = {
-        history['status']: history['timestamp']
-        for history in order['statusHistory']
+            history.status: history.timestamp
+            for history in order.history.all()
+        }
+    
+    statusIcons = {
+        'Placed': 'clock',
+        'Confirmed': 'check',
+        'Assigned': 'truck',
+        'Packed': 'package',
+        'Out for Delivery': 'truck',
+        'Delivered': 'check',
     }
-
-    def get_timestamp(status):
-        for his in order['statusHistory']:
-            if his['status'] == status:
-                return his['timestamp']
 
     allStatusInfo = [
         {
-            'status':'Placed',
-            'icon':'clock',
-            'timestamp': get_timestamp('Placed')
-        },{
-            'status':'Confirmed',
-            'icon':'check',
-            'timestamp': get_timestamp('Confirmed')
-        },{
-            'status':'Assigned',
-            'icon':'truck',
-            'timestamp': get_timestamp('Assigned')
-        },{
-            'status':'Packed',
-            'icon':'package',
-            'timestamp': get_timestamp('Packed')
-        },{
-            'status':'Out for Delivery',
-            'icon':'truck',
-            'timestamp': get_timestamp('Out for Delivery')
-        },{
-            'status':'Delivered',
-            'icon':'check',
-            'timestamp': get_timestamp('Delivered')
+            'status': status,
+            'icon': statusIcons.get(status, 'circle'),
+            'timestamp': statusHistory.get(status),
         }
+        for status in allStatus
     ]
 
     context={
         "order":order,
-        'liveLocation': None,
         'showOtp': showOtp,
         'liveLocation':liveLocation,
         'allStatus':allStatus,
-        'statusIcons': statusIcons,
-        'currentIdx':allStatus.index(order['status']),
+        'currentIdx':currentIdx,
         'statusHistory':statusHistory,
         'allStatusInfo':allStatusInfo,
     }

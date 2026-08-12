@@ -63,7 +63,7 @@ class DeliveryPartnerAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'shipping_address', 'payment_method', 'subtotal', 'delivery_fee', 'tax', 'total', 'status', 'delivery_partenr', 'delivery_otp', 'live_location', 'is_paid', 'created_at', 'updated_at', )
+    list_display = ('id', 'user', 'shipping_address', 'payment_method', 'subtotal', 'delivery_fee', 'tax', 'total', 'status', 'delivery_partner', 'delivery_otp', 'live_location', 'is_paid', 'created_at', 'updated_at', )
     list_filter = ('payment_method', 'status', 'is_paid', 'updated_at', )
     search_fields = ('shipping_address', 'user', 'delivery_partner', )
     ordering = ('-updated_at', )

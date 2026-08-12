@@ -12,7 +12,7 @@ urlpatterns = [
     path("checkout/", Checkout, name="Checkout"),
 
     path("orders/", MyOrders, name="MyOrders"),
-    path("orders/<str:odid>/", OrderTracking, name = "OrderTracking"),
+    path("orders/<int:odid>/", OrderTracking, name = "OrderTracking"),
     path('api/order/<str:odid>/update-location/', update_driver_location, name='update_driver_location'),
 
     path("addresses/", Addresses, name = "Addresses"),
