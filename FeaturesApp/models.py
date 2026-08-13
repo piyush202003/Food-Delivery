@@ -4,6 +4,7 @@ import secrets
 from django.db import models
 from accounts.models import Address
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
@@ -57,16 +58,20 @@ class DeliveryPartner(models.Model):
         ("scooter", "Scooter"),
         ("car", "Car"),
     ]
-    # name = models.CharField(max_length=100)
-    # email = models.EmailField(unique=True)
-    # phone = models.CharField(max_length=15)
-    # password = models.CharField(max_length=128)
-    # avatar = models.ImageField(upload_to="deliveryPartner/", blank=True, null=True)
-    user = models.ForeignKey( settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="delivery_partner")
+    name = models.CharField(max_length=100,)
+    email = models.EmailField(unique=True,)
+    phone = models.CharField(max_length=15,)
+    password = models.CharField(max_length=128,)
+    avatar = models.ImageField(upload_to="deliveryPartner/", blank=True, null=True)
     vehicle_type = models.CharField(max_length=20, choices=VEHICLE_TYPES, default='bike')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if self.password is not None:
+            self.password = make_password(self.password)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

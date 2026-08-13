@@ -44,14 +44,14 @@ class CartItemAdmin(admin.ModelAdmin):
 
 @admin.register(DeliveryPartner)
 class DeliveryPartnerAdmin(admin.ModelAdmin):
-    list_display = ( 'user', 'vehicle_type', 'is_active', 'created_at', 'updated_at', )
+    list_display = ( 'name', 'email', 'phone', 'password', 'vehicle_type', 'is_active', 'created_at', 'updated_at', )
     list_filter = ('vehicle_type', 'is_active', )
     search_fields = ('name', 'email', 'phone', )
     ordering = ('-created_at', )
     readonly_fields = ('created_at', 'updated_at', )
     fieldsets = (
         ('Partner Info',{
-            'fields': ('user', )
+            'fields': ('name', 'email', 'phone', 'password', 'avatar', )
         }),
         ('Vehicle Info',{
             'fields' : ('vehicle_type', 'is_active', )
