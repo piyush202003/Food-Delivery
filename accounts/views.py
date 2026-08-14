@@ -17,7 +17,7 @@ def login_view(request):
         user = authenticate( request, email=email, password=password)
 
         if user:
-            messages.success(request, f'User with username {user.username} successfully Logged In.')
+            messages.success(request, f'Welcom Back {user.first_name} {user.last_name}')
             login(request, user)
             return redirect('Home')
         else:
