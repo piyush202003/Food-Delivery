@@ -101,7 +101,7 @@ def AdminProductForm(request, id=None):
 @admin_required
 def AdminOrders(request):
     orders = Order.objects.all().order_by('-created_at')
-    partners = DeliveryPartner.objects.filter(is_active=True).order_by('name')
+    partners = DeliveryPartner.objects.filter(is_active=True).order_by('user__email')
     statusOptions = ["Placed", "Confirmed", "Assigned", "Packed", "Out for Delivery", "Delivered", "Cancelled"]
 
     selectedPartner = ''
@@ -119,7 +119,7 @@ def AdminOrders(request):
                     status='Assigned',
                 )
                 order.save()
-                messages.success(request, f'For order #{order.id} delivery partner {partner.name} is assigned.')
+                messages.success(request, f'For order #{order.id} delivery partner {partner.user} is assigned.')
         elif 'status_change' in request.POST:
             status = request.POST.get('status_change')
             order_id = request.POST.get('order_id')

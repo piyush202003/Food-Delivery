@@ -11,16 +11,7 @@ class UserAdmin(BaseUserAdmin):
     # add_form = CustomUserCreationForm
     # form = CustomUserChangeForm
 
-    list_display = (
-        "email",
-        "username",
-        "first_name",
-        "last_name",
-        "is_admin",
-        "is_delivery_partner",
-        "is_staff",
-        "is_active",
-    )
+    list_display = ( "email", "username", "first_name", "last_name", "is_admin", "is_delivery_partner", "is_staff", "is_active", )
 
     ordering = ("email",)
     readonly_fields = ( "last_login","date_joined",)
@@ -28,10 +19,7 @@ class UserAdmin(BaseUserAdmin):
         ( "Login information", { "fields": ( "email", "username", "password", ) }, ),
         ( "Personal information", { "fields": ( "first_name", "last_name", "phone", "avatar", ) },),
         ( "Permissions", { "fields": ( "is_staff", "is_superuser", "is_admin", "is_delivery_partner", )}, ),
-        ( "Important dates",
-            {
-                "fields": ( "last_login", "date_joined", )
-            }),
+        ( "Important dates", { "fields": ( "last_login", "date_joined", ) }),
     )
 
 @admin.register(Address)

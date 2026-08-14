@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, login, hashers, authenticate
 
 from FeaturesApp.dummyData import dummyDashboardOrdersData, statusColors
-from FeaturesApp.models import DeliveryPartner
+from FeaturesApp.models import DeliveryPartner, Order
 from accounts.models import User
 from .dummyData import dummy_delivery_partner_data
 from .decorators import delivey_partner_required
@@ -27,13 +27,13 @@ def DeliveryLogin(request):
 
 @delivey_partner_required
 def DeliveryLogout(request):
-    logout(request.user)
+    logout(request)
     messages.warning(request, 'Your has been Logged Out!')
     return render(request, 'delivery/DeliveryLogin.html')
 
 @delivey_partner_required
 def DeliveryDashboard(request):
-    orders = dummyDashboardOrdersData()
+    orders = Order.objects.filter(delivery_partner__user=request.user)
 
     # tab acitve or completed
     tab = request.GET.get('tab','')
