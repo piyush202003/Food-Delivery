@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import logout, login
+from django.contrib.auth import logout, login, hashers
 
 from FeaturesApp.dummyData import dummyDashboardOrdersData, statusColors
 from FeaturesApp.models import DeliveryPartner
@@ -16,18 +16,14 @@ def DeliveryLogin(request):
         if user is None:
             messages.error(request, 'Entered Email is not Registered..')
             return redirect('DeliveryPartnerLogin')
-        if user.password != password:
-            messages.error(request, 'Entered Password is wrong.')
-            return redirect('DeliveryPartnerLogin')
-
-        login(user)
-        messages.success(request, 'User has been Logged In')
-        return redirect('DeliveryDashboard')    
-
-    context={
-
-    }
-    return render(request, 'delivery/DeliveryLogin.html', context=context)
+        if hashers.check_password(password, user.password) :
+            # login(user)
+            messages.success(request, 'User has been Logged In')
+            return redirect('DeliveryDashboard') 
+        
+        messages.error(request, 'Entered Password is wrong.')
+        return redirect('DeliveryPartnerLogin')
+    return render(request, 'delivery/DeliveryLogin.html')
 
 def DeliveryLogout(request):
     logout(request.user)
