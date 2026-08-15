@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, login, hashers, authenticate
 
 from FeaturesApp.dummyData import dummyDashboardOrdersData, statusColors
-from FeaturesApp.models import DeliveryPartner, Order
+from FeaturesApp.models import DeliveryPartner, Order, OrderStatus
 from accounts.models import User
 from .dummyData import dummy_delivery_partner_data
 from .decorators import delivey_partner_required
@@ -49,7 +49,8 @@ def DeliveryDashboard(request):
     else:
         tracking = request.session.get("deliveryPartnerTracking", False)
 
-    # handleUpdateStatus(orderid, status) remaining
+    # handleUpdateStatus(orderid, status)
+
     orderStatusColors = statusColors()
 
     otpModal = request.GET.get("otpModal",'')
@@ -62,7 +63,6 @@ def DeliveryDashboard(request):
     else:
         otpModel = request.session.get('deliveryPartnerOtpModal')
     
-    # print(f'otpModal = {otpModal}')
     otp = ''
 
     submitting = False
@@ -70,16 +70,15 @@ def DeliveryDashboard(request):
     cancelModal = request.GET.get("cancelModal",'')
     if cancelModal:
         if cancelModal == 'None':
-            request.session['deliveryPartnerCancelModal'] = None
+            request.session.pop('deliveryPartnerCancelModal')
             cancelModal = None
         else:
             request.session['deliveryPartnerCancelModal'] = cancelModal
     else:
         cancelModel = request.session.get('deliveryPartnerCancelModal')
-    cancelReason = None
+
 
     context={
-        'partner':dummy_delivery_partner_data()[0],
         'tab': tab,
         'tracking': tracking,
         'orders':orders,
@@ -89,6 +88,37 @@ def DeliveryDashboard(request):
         'cancelModal':cancelModal,
     }
     return render(request, 'delivery/DeliveryDashboard.html', context=context)
+
+@delivey_partner_required
+def UpdateDeliveryStatus(request, order_id):
+    if request.method != "POST":
+        return redirect('DeliveryDashboard')
+
+    order = get_object_or_404(Order, id=order_id, delivery_partner__user=request.user)
+
+    new_status = request.POST.get('status')
+
+    allowed_transitions = {
+        'Assigned':['Packed'],
+        'Packed':['Out for Delivery'],
+        'Out for Delivery':['Delivered'],
+    }
+
+    allowed_next_statuses = allowed_transitions.get(order.status, [])
+
+    if new_status not in allowed_next_statuses:
+        messages.error(request, f'Cannot change order from {order.status} to {new_status}')
+        return redirect('DeliveryDashboard')
+
+
+    order.status = new_status
+    order.save()
+
+    OrderStatus.objects.create(order=order, status=new_status)
+
+    messages.success(request, f'Order #{str(order.id)[-6:].upper()} updated to {new_status}.')
+
+    return redirect('DeliveryDashboard')
 
 @delivey_partner_required
 def VerifyOtp(request, id):
