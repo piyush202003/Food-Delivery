@@ -42,14 +42,19 @@ def DeliveryDashboard(request):
     else:
         tab = request.session.get('deliveryPartnerTab', 'active') 
 
+    print(tab)
+    if tab == 'completed':
+        orders = orders.filter(status__in=['Delivered', 'Cancelled'])
+    elif tab == 'active':
+        orders = orders.filter(status__in=['Assigned', 'Packed', 'Out for Delivery'])
+    
+
     tracking = request.GET.get("tracking")
     if tracking is not None:
         tracking = tracking == "1"
         request.session["deliveryPartnerTracking"] = tracking
     else:
         tracking = request.session.get("deliveryPartnerTracking", False)
-
-    # handleUpdateStatus(orderid, status)
 
     orderStatusColors = statusColors()
 
@@ -79,7 +84,7 @@ def DeliveryDashboard(request):
 
 
     context={
-        'tab': tab,
+        'tab' : tab,
         'tracking': tracking,
         'orders':orders,
         'statusColors':orderStatusColors,

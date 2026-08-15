@@ -388,7 +388,7 @@ def MyOrders(request):
     context={
         'cart':cart(request),
         'orders':orders.prefetch_related('items__product').order_by('-created_at'),
-        'tabs':['All Orders', 'Placed', 'Out For Delivery', 'Delivered', 'Cancelled'],
+        'tabs':['All Orders', 'Placed', 'Out for Delivery', 'Delivered', 'Cancelled'],
         'activeTab':activeTab,
         'statusColours':statusCol,
     }
