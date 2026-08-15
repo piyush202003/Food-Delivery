@@ -70,7 +70,7 @@ def DeliveryDashboard(request):
     cancelModal = request.GET.get("cancelModal",'')
     if cancelModal:
         if cancelModal == 'None':
-            request.session.pop('deliveryPartnerCancelModal')
+            request.session['deliveryPartnerCancelModal'] = None
             cancelModal = None
         else:
             request.session['deliveryPartnerCancelModal'] = cancelModal
