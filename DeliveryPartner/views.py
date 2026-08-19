@@ -42,13 +42,12 @@ def DeliveryDashboard(request):
     else:
         tab = request.session.get('deliveryPartnerTab', 'active') 
 
-    print(tab)
     if tab == 'completed':
         orders = orders.filter(status__in=['Delivered', 'Cancelled'])
     elif tab == 'active':
         orders = orders.filter(status__in=['Assigned', 'Packed', 'Out for Delivery'])
     
-
+    # Tracking share location
     tracking = request.GET.get("tracking")
     if tracking is not None:
         tracking = tracking == "1"
@@ -58,6 +57,7 @@ def DeliveryDashboard(request):
 
     orderStatusColors = statusColors()
 
+    # otp verification form otpModal=order_id
     otpModal = request.GET.get("otpModal",'')
     if otpModal:
         if otpModal == 'None':
@@ -67,11 +67,10 @@ def DeliveryDashboard(request):
             request.session['deliveryPartnerOtpModal'] = otpModal
     else:
         otpModel = request.session.get('deliveryPartnerOtpModal')
-    
-    otp = ''
 
     submitting = False
 
+    # Canceling order cancelModel=order_id
     cancelModal = request.GET.get("cancelModal",'')
     if cancelModal:
         if cancelModal == 'None':
@@ -89,7 +88,6 @@ def DeliveryDashboard(request):
         'orders':orders,
         'statusColors':orderStatusColors,
         'otpModal':otpModal,
-        'otp':otp,
         'cancelModal':cancelModal,
     }
     return render(request, 'delivery/DeliveryDashboard.html', context=context)
@@ -126,12 +124,20 @@ def UpdateDeliveryStatus(request, order_id):
     return redirect('DeliveryDashboard')
 
 @delivey_partner_required
-def VerifyOtp(request, id):
+def VerifyOtp(request):
     if request.method == 'POST':
         otp = request.POST.get('otp')
-        if otp:
-            print(f'Given OTP for Order id={id} is {otp}')
-        else:
-            messages.error(request, 'Please enter OTP given by Customer')
+        order_id = request.POST.get('order_id',0)
 
-    return redirect(request, 'DeliveryDashboard')
+        order = get_object_or_404(Order, id=int(order_id))
+
+        if order.delivery_otp==otp:
+            order.status = 'Delivered'
+            order.save()
+        
+            OrderStatus.objects.create(order=order, status='Delivered')
+            messages.success(request, 'Order has been delivered.')
+        else:
+            messages.error(request, 'Please enter Valid OTP given by Customer')
+
+    return redirect('DeliveryDashboard')

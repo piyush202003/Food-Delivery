@@ -49,7 +49,7 @@
         <div class="px-5 py-3 border-t border-zinc-400 flex flex-wrap gap-2">
             
             {% if order.status == 'Assigned' %}
-                <form method="POST" action="{% url 'UpdateDeliveryStatus' order.id %}"> <!-- onClick={() => handleUpdateStatus(order._id, order.status === "Assigned" ? "Packed" : "Out for Delivery")} -->
+                <form method="POST" action="{% url 'UpdateDeliveryStatus' order.id %}">
                     {% csrf_token %}
                     <input type="hidden" name="status" value="Packed">
                     <button type="submit" class="px-4 py-2 text-sm font-medium bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors flex items-center gap-1.5 cursor-pointer">
@@ -75,7 +75,6 @@
                 </a>
             {% endif %}
             {% if order.status != 'Delivered' and order.status != 'Cancelled' %}
-                <!-- onClick={() => setCancelModal(order._id)} -->
                 <a href="?cancelModal={{ order.id }}">
                     <button class="px-4 py-2 text-sm font-medium bg-red-50 text-red-700 rounded-xl hover:bg-red-100 transition-colors flex items-center gap-1.5 cursor-pointer">
                         <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
@@ -88,7 +87,7 @@
         <div class="px-5 py-3 border-t border-zinc-400">
             <p class="text-xs text-zinc-500 flex items-center gap-1">
                 <i data-lucide="clock" class="size-3"></i>
-                {{ order.created_at|date:'d Y M' }}
+                {{ order.created_at|date:'d M Y' }}
             </p>
         </div>
     {% endif %}
