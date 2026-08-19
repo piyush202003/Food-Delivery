@@ -141,3 +141,18 @@ def VerifyOtp(request):
             messages.error(request, 'Please enter Valid OTP given by Customer')
 
     return redirect('DeliveryDashboard')
+
+@delivey_partner_required
+def CancelModel(request):
+    if request.method == 'POST':
+        reason = request.POST.get('cancel_reason')
+        order_id = request.POST.get('order_id',0)
+
+        order = get_object_or_404(Order, id=int(order_id))
+        order.status = 'Cancelled'
+        order.save()
+    
+        OrderStatus.objects.create(order=order, status='Cancelled')
+        messages.success(request, f'Order with Order Id #{order_id} has been Cancelled.')
+
+    return redirect('DeliveryDashboard')
