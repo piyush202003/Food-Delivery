@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.shortcuts import render,redirect, get_object_or_404
 
-
 from AdminPanal.decorators import admin_required
 from AdminPanal.dummyData import dummy_admin_dashboard_data
 from DeliveryPartner.dummyData import dummy_delivery_partner_data
@@ -161,6 +160,49 @@ def AdminOrders(request):
 def AdminDeliveryPartners(request):
 
     partners = DeliveryPartner.objects.all()
+
+    active_status=request.GET.get('active_status')
+    if active_status:
+        partner_id = request.GET.get('partner_id',0)
+        partner = partners.filter(id=int(partner_id)).first()
+        if partner:
+            partner.is_active = not partner.is_active
+            partner.save()
+            messages.success(request, f'Status of Delivery Parnter with ID #{partner_id} is Updated.')
+        else:
+            messages.warning(request, f'Delivery Partner with ID #{partner_id} is not availablein database!')
+        return redirect('AdminDeliveryPartners')
+
+    if request.method == 'POST':
+        firstName=request.POST.get('first_name')
+        middleName=request.POST.get('middle_name')
+        lastName=request.POST.get('last_name')
+        email=request.POST.get('email')
+        password=request.POST.get('password')
+        phone=request.POST.get('phone')
+        vehicleType=request.POST.get('vehicle_type')
+
+        if User.objects.filter(email=email):
+            messages.warning(request, 'Account with this Email Id already exists!')
+        elif User.objects.filter(username=f'{firstName}{middleName}{lastName}'):
+            messages.warning(request, 'Account with this Name already exists!')
+        else:
+            user = User.objects.create_user(
+                username=f'{firstName}{middleName}{lastName}',
+                first_name=firstName,
+                last_name=lastName,
+                email=email,
+                password=password,
+                phone=phone,
+                is_delivery_partner=True,
+            )
+
+            DeliveryPartner.objects.create(
+                user=user,
+                vehicle_type=vehicleType,
+            )
+
+            messages.success(request, "New delivery Partner has been created.")
 
     context={
         'AdminLinkData':AdminLinkData,
