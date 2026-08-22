@@ -16,6 +16,10 @@ def DeliveryLogin(request):
 
         user = authenticate(request, email=email, password=password)
         if user:
+            if user.delivery_partner.is_active == False:
+                messages.error(request, 'Your account has been deactivated. Reactive it through Admin.')
+                return redirect('DeliveryDashboard')
+            
             login(request, user)
             messages.success(request, f'Welcome {user.first_name} {user.last_name} to Delivery Partners Panal.')
             return redirect('DeliveryDashboard') 
@@ -131,6 +135,10 @@ def VerifyOtp(request):
 
         order = get_object_or_404(Order, id=int(order_id))
 
+        if order.status=='Delivered' or order.status=='Cancelled':
+            messages.warning(request, 'Invalid Request')
+            return redirect('DeliveryDashboard')
+
         if order.delivery_otp==otp:
             order.status = 'Delivered'
             order.save()
@@ -149,9 +157,14 @@ def CancelModel(request):
         order_id = request.POST.get('order_id',0)
 
         order = get_object_or_404(Order, id=int(order_id))
+
+        if(order.status=='Delivered'):
+            messages.warning(request, 'Cannot Cancel the Delivered Order')
+            return redirect('DeliveryDashboard')
+        
         order.status = 'Cancelled'
         order.save()
-    
+
         OrderStatus.objects.create(order=order, status='Cancelled')
         messages.success(request, f'Order with Order Id #{order_id} has been Cancelled.')
 
